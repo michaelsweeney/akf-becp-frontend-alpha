@@ -31,7 +31,7 @@ const App = (props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className={classes.app}>heyyy</div>
+      <div className={classes.app}>ddd</div>
     </ThemeProvider>
   );
 };
