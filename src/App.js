@@ -5,6 +5,9 @@ import { conn } from "./store/connect";
 import { makeStyles } from "@material-ui/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
+import InputTable from "./components/inputtable";
+import { Input } from "@material-ui/core";
+
 const theme = createTheme({
   palette: {
     secondary: {
@@ -31,7 +34,9 @@ const App = (props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className={classes.app}>ddd</div>
+      <div className={classes.app}>
+        <InputTable />
+      </div>
     </ThemeProvider>
   );
 };
