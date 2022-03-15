@@ -1,10 +1,17 @@
-const initialState = {};
+const initialState = {
+  dims: {
+    height: window.innerHeight,
+    width: window.innerWidth,
+  },
+
+};
 
 export default function uiReducer(state = initialState, action) {
   switch (action.type) {
-    case "DO_SOMETHING": {
+    case "SET_WINDOW_DIMENSIONS": {
       return {
         ...state,
+        dims: action.payload
       };
     }
 
