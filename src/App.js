@@ -1,13 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import { conn } from "./store/connect";
 
 import { makeStyles } from "@material-ui/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-import InputTable from "./components/inputtable";
-import { Input } from "@material-ui/core";
-
+import { getProjectionFromReferenceBuildings } from "./apicalls";
+import PlotContainer from "./components/plotcontainer";
 const theme = createTheme({
   palette: {
     secondary: {
@@ -20,22 +19,26 @@ const theme = createTheme({
 });
 
 const useStyles = makeStyles({
-  app: {
-    // height: "100vh",
-    // width: "100vw",
-    // minWidth: 900,
-    // boxSizing: "border-box",
-    // overflow: "hidden",
-  },
+  app: {},
 });
 
 const App = (props) => {
   const classes = useStyles();
+  let { case_inputs, case_outputs } = props.cases;
+
+  useEffect(() => {
+    getProjectionFromReferenceBuildings(
+      case_inputs,
+      props.actions.setCaseResults
+    );
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
       <div className={classes.app}>
-        <InputTable />
+        <div>{JSON.stringify(case_inputs)}</div>
+        <div>{JSON.stringify(case_outputs)}</div>
+        <PlotContainer />
       </div>
     </ThemeProvider>
   );
@@ -44,6 +47,7 @@ const App = (props) => {
 const mapStateToProps = (store) => {
   return {
     actions: { ...store.actions },
+    cases: { ...store.cases },
   };
 };
 

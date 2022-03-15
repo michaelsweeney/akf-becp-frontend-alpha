@@ -1,11 +1,11 @@
 import { combineReducers } from "redux";
 
 import uiReducer from "./uireducer";
-import buildingReducer from "./buildingreducer";
+import caseReducer from "./casereducer";
 
 const rootReducer = combineReducers({
   ui: uiReducer,
-  building: buildingReducer,
+  cases: caseReducer,
 });
 
 export default rootReducer;

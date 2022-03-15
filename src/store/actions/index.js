@@ -1,7 +1,14 @@
 /* building actions */
-export function doSomething(idx) {
+export function setCaseResults(data) {
   return {
-    type: "DO_SOMETHING",
-    payload: idx,
+    type: "SET_CASE_RESULTS",
+    payload: data,
+  };
+}
+
+export function setCaseInputs(data) {
+  return {
+    type: "SET_CASE_INPUTS",
+    payload: data,
   };
 }
