@@ -1,19 +1,19 @@
 const initialState = {
   case_inputs: [
     {
-      name: 'Electric Resistance',
+      name: "Electric Resistance",
       state: "MA",
       climate_zone: "5A",
       projection_case: "MidCase",
       design_areas: [
         {
-          type: "LargeOffice",
+          type: "MediumOffice",
           area: 200000,
           heating_fuel: "Electricity",
           dhw_fuel: "Electricity",
           heating_cop: 1,
           dhw_cop: 1,
-          ashrae_standard: "90.1-2013",
+          ashrae_standard: "90.1-2016",
         },
         {
           type: "MediumOffice",
@@ -22,24 +22,24 @@ const initialState = {
           dhw_fuel: "Electricity",
           heating_cop: 1,
           dhw_cop: 1,
-          ashrae_standard: "90.1-2007",
+          ashrae_standard: "90.1-2016",
         },
       ],
     },
     {
-      name: 'Electric HP',
+      name: "Electric HP",
       state: "MA",
       climate_zone: "5A",
       projection_case: "MidCase",
       design_areas: [
         {
-          type: "LargeOffice",
+          type: "MediumOffice",
           area: 200000,
           heating_fuel: "Electricity",
           dhw_fuel: "Electricity",
           heating_cop: 3,
           dhw_cop: 3,
-          ashrae_standard: "90.1-2013",
+          ashrae_standard: "90.1-2016",
         },
         {
           type: "MediumOffice",
@@ -48,41 +48,39 @@ const initialState = {
           dhw_fuel: "Electricity",
           heating_cop: 3,
           dhw_cop: 3,
-          ashrae_standard: "90.1-2007",
+          ashrae_standard: "90.1-2016",
         },
       ],
     },
     {
-      name: 'Gas Boilers',
+      name: "Gas Boilers",
       state: "MA",
       climate_zone: "5A",
       projection_case: "MidCase",
       design_areas: [
         {
-          type: "LargeOffice",
+          type: "MediumOffice",
           area: 200000,
           heating_fuel: "Natural Gas",
           dhw_fuel: "Natural Gas",
           heating_cop: 0.8,
           dhw_cop: 0.8,
-          ashrae_standard: "90.1-2013",
+          ashrae_standard: "90.1-2016",
         },
         {
-          type: "LargeOffice",
+          type: "MediumOffice",
           area: 10000,
           heating_fuel: "Natural Gas",
           dhw_fuel: "Natural Gas",
           heating_cop: 0.8,
           dhw_cop: 0.8,
-          ashrae_standard: "90.1-2007",
+          ashrae_standard: "90.1-2016",
         },
       ],
     },
   ],
 
   case_results: [],
-  berdo_results: [],
-  ll97_results: []
 };
 
 export default function buildingReducer(state = initialState, action) {
@@ -100,18 +98,6 @@ export default function buildingReducer(state = initialState, action) {
       };
     }
 
-    case "SET_LL97_RESULTS": {
-      return {
-        ...state,
-        ll97_results: action.payload,
-      };
-    }
-    case "SET_BERDO_RESULTS": {
-      return {
-        ...state,
-        berdo_results: action.payload,
-      };
-    }
     default:
       return state;
   }

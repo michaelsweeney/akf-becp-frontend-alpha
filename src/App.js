@@ -5,9 +5,7 @@ import { conn } from "./store/connect";
 import { makeStyles } from "@material-ui/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-
-
-import * as api from './apicalls'
+import * as api from "./apicalls";
 
 import PlotContainer from "./components/plotcontainer";
 const theme = createTheme({
@@ -27,8 +25,7 @@ const useStyles = makeStyles({
 
 const App = (props) => {
   const classes = useStyles();
-  let { case_inputs, case_results, berdo_results, ll97_results } = props.cases;
-
+  let { case_inputs, case_results } = props.cases;
 
   // handle resize
   useEffect(() => {
@@ -43,34 +40,26 @@ const App = (props) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [props.actions]);
 
-
-
   const handleCaseChange = (results) => {
-
-    props.actions.setCaseResults(results.case_results)
-    props.actions.setBerdoResults(results.berdo_results)
-    props.actions.setLL97Results(results.ll97_results)
-
-  }
+    props.actions.setCaseResults(results);
+  };
 
   useEffect(() => {
-    api.getProjectionFromReferenceBuildings(
-      case_inputs,
-      handleCaseChange
-    )
-
-
-
+    api.getProjectionFromReferenceBuildings(case_inputs, handleCaseChange);
   }, []);
 
   return (
     <ThemeProvider theme={theme}>
       <div className={classes.app}>
-        <a target="_blank" rel="noopener" href='https://akf-becp-pyapi.herokuapp.com/'>api</a>
+        <a
+          target="_blank"
+          rel="noopener"
+          href="https://akf-becp-pyapi.herokuapp.com/"
+        >
+          api
+        </a>
 
         <PlotContainer />
-        <div>{JSON.stringify(ll97_results['emissions_thresholds_per_sf'])}</div>
-        <div>{JSON.stringify(berdo_results['emissions_thresholds_per_sf'])}</div>
 
         <div>{JSON.stringify(case_inputs)}</div>
         <div>{JSON.stringify(case_results)}</div>
