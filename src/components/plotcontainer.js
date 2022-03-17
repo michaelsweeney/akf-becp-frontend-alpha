@@ -208,6 +208,7 @@ const PlotContainer = (props) => {
     //     .attr("stroke-dasharray", 4);
 
     // --- AREA PLOT THRESHOLDS
+    // template source: https://www.d3-graph-gallery.com/graph/stackedarea_template.html
     let alternate_position = 2;
 
     let data = emissions_projections_by_fuel[alternate_position].map((d) => {
