@@ -1,5 +1,5 @@
-// const url = "https://akf-becp-pyapi.herokuapp.com/";
-const url = "http://localhost:5000";
+const url = "https://akf-becp-pyapi.herokuapp.com/";
+// const url = "http://localhost:5000";
 
 export const ref_bldg_to_berdo_type = {
   SecondarySchool: "education",
@@ -40,31 +40,6 @@ export const ref_bldg_to_ll97_type = {
 };
 
 async function getProjectionFromReferenceBuildings(alternates, callback) {
-  // take first element design_areas, convert for ll97 & berdo thresholds
-  let berdo_types = alternates[0]["design_areas"].map((e) => {
-    return {
-      type: ref_bldg_to_berdo_type[e["type"]],
-      area: e["area"],
-    };
-  });
-
-  let ll97_types = alternates[0]["design_areas"].map((e) => {
-    return {
-      type: ref_bldg_to_ll97_type[e["type"]],
-      area: e["area"],
-    };
-  });
-
-  // dummy utilities for now (should move this entire thing out of this function and pull fuels based on actual refbuilding results)
-  let berdo_parameters = {
-    types: berdo_types,
-    utilities: [{ type: "electricity", val: 0 }],
-  };
-  let ll97_parameters = {
-    types: ll97_types,
-    utilities: [{ type: "electricity", val: 100000 }],
-  };
-
   let projection_results = [];
 
   async function getQueryResults(params, subdirectory) {
@@ -75,10 +50,56 @@ async function getProjectionFromReferenceBuildings(alternates, callback) {
   }
 
   for (const alt of alternates) {
+    /* GET CASE INFO (REFBUILDINGS / CAMBIUM) */
     let case_results = await getQueryResults(
       alt,
       "get_projection_from_reference_buildings"
     );
+
+    /* GET COMPLIANCE INFO */
+    let berdo_types = alt["design_areas"].map((e) => {
+      return {
+        type: ref_bldg_to_berdo_type[e["type"]],
+        area: e["area"],
+      };
+    });
+
+    let ll97_types = alt["design_areas"].map((e) => {
+      return {
+        type: ref_bldg_to_ll97_type[e["type"]],
+        area: e["area"],
+      };
+    });
+
+    let { enduses_absolute_kbtu } = case_results.enduses;
+    let fuels = {};
+    enduses_absolute_kbtu.forEach((f) => {
+      let { fuel, kbtu_absolute } = f;
+      if (fuel in fuels) {
+        fuels[fuel] += kbtu_absolute;
+      } else {
+        fuels[fuel] = 0;
+      }
+    });
+
+    let compliance_utilities = [];
+    Object.keys(fuels).forEach((key) => {
+      let val = fuels[key];
+      let fuel_name = key.toLowerCase().replace(" ", "_");
+      compliance_utilities.push({
+        type: fuel_name,
+        val: val,
+      });
+    });
+
+    let berdo_parameters = {
+      types: berdo_types,
+      utilities: compliance_utilities,
+    };
+    let ll97_parameters = {
+      types: ll97_types,
+      utilities: compliance_utilities,
+    };
 
     let berdo_results = await getQueryResults(
       berdo_parameters,
@@ -88,6 +109,8 @@ async function getProjectionFromReferenceBuildings(alternates, callback) {
       ll97_parameters,
       "/compliance/compile_ll97_summary"
     );
+
+    /* COMPILE AND PUSH RESULTS */
     projection_results.push({
       name: alt.name,
       case_results,
@@ -95,7 +118,13 @@ async function getProjectionFromReferenceBuildings(alternates, callback) {
       berdo_results,
     });
   }
-  console.log(projection_results);
+
+  projection_results.map((d) => {
+    let payment_sum = 0;
+    d["berdo_results"]["acp_payments"].map((e) => {
+      payment_sum += e["val"];
+    });
+  });
   callback(projection_results);
 }
 
