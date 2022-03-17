@@ -23,10 +23,14 @@ const PlotContainer = (props) => {
     let emissions_projections = case_results.map(
       (d) => d["case_results"]["emissions_projection"]
     );
+
+    let emissions_projections_by_fuel = case_results.map(
+      (d) => d["case_results"]["emissions_projection_by_fuel"]
+    );
+
     let berdo_thresholds = case_results.map(
       (d) => d["berdo_results"]["emissions_thresholds_per_sf"]
     );
-
     let ll97_thresholds = case_results.map(
       (d) => d["ll97_results"]["emissions_thresholds_per_sf"]
     );
@@ -65,11 +69,18 @@ const PlotContainer = (props) => {
 
     d3.select(node).selectAll("svg").data([0]).join("svg");
 
-    let plotg = svg
-      .selectAll(".plot-g")
+    let multilineg = svg
+      .selectAll(".multiline-g")
       .data([0])
       .join("g")
-      .attr("class", "plot-g")
+      .attr("class", "multiline-g")
+      .attr("transform", `translate(${margins.l},${margins.t})`);
+
+    let stackedareag = svg
+      .selectAll(".stacked-area-g")
+      .data([0])
+      .join("g")
+      .attr("class", "stacked-area-g")
       .attr("transform", `translate(${margins.l},${margins.t})`);
 
     let thresholdg = svg
@@ -104,6 +115,7 @@ const PlotContainer = (props) => {
       ll97_thresholds[0][0]["val"],
     ]);
 
+    // todo: fix this to accept parameteres for which datasets to use
     let max_emission_val = () => {
       let max = 0;
       emissions_projections.forEach((ar) => {
@@ -117,6 +129,7 @@ const PlotContainer = (props) => {
       d3.max([max_threshold_val, max_emission_val()]) * y_padding,
       0,
     ];
+    // end todo
 
     let xScale = d3.scaleTime().range([0, chartdims.width]).domain(domain_x);
     let yScale = d3.scaleLinear().range([0, chartdims.height]).domain(domain_y);
@@ -127,24 +140,24 @@ const PlotContainer = (props) => {
     xaxisg.call(xAxis);
     yaxisg.call(yAxis);
 
-    let lineGen = d3
-      .line()
-      .x((d) => xScale(d["year"]))
-      .y((d) => yScale(d["kg_co2_per_sf"]));
+    // let lineGen = d3
+    //   .line()
+    //   .x((d) => xScale(d["year"]))
+    //   .y((d) => yScale(d["kg_co2_per_sf"]));
 
-    plotg
-      .selectAll(".data-line")
-      .data(emissions_projections)
-      .join("path")
-      .attr("class", "data-line")
-      .attr("d", lineGen)
-      .attr("fill", "none")
-      .attr("stroke", (d, i) => colorScale[i])
-      .attr("stroke-width", 3);
+    // multiline
+    //   .selectAll(".data-line")
+    //   .data(emissions_projections)
+    //   .join("path")
+    //   .attr("class", "data-line")
+    //   .attr("d", lineGen)
+    //   .attr("fill", "none")
+    //   .attr("stroke", (d, i) => colorScale[i])
+    //   .attr("stroke-width", 3);
 
     // --- EMISSIONS THRESHOLDS
 
-    // ------ BERDO THRESHOLDS (from first alternate in array)
+    // --- BERDO THRESHOLDS (from first alternate in array)
     thresholdg
       .selectAll(".berdo-threshold-circle")
       .data(berdo_thresholds[0])
@@ -169,30 +182,85 @@ const PlotContainer = (props) => {
       .attr("stroke-width", 2)
       .attr("stroke-dasharray", 4);
 
-    // ------ LL97 THRESHOLDS (from first alternate in array)
-    thresholdg
-      .selectAll(".ll97-threshold-circle")
-      .data(ll97_thresholds[0])
-      .join("circle")
-      .attr("class", "ll97-threshold-circle")
-      .attr("cx", (d) => xScale(d["period"].split("-")[0]))
-      .attr("cy", (d) => yScale(d["val"]))
-      .attr("r", 4)
-      .attr("fill", "blue");
+    //// --- LL97 THRESHOLDS (from first alternate in array)
+    //   thresholdg
+    //     .selectAll(".ll97-threshold-circle")
+    //     .data(ll97_thresholds[0])
+    //     .join("circle")
+    //     .attr("class", "ll97-threshold-circle")
+    //     .attr("cx", (d) => xScale(d["period"].split("-")[0]))
+    //     .attr("cy", (d) => yScale(d["val"]))
+    //     .attr("r", 4)
+    //     .attr("fill", "blue");
 
-    thresholdg
-      .selectAll(".ll97-threshold-line")
-      .data(ll97_thresholds[0])
-      .join("line")
-      .attr("class", "ll97-threshold-line")
-      .attr("x1", (d) => xScale(d["period"].split("-")[0]))
-      .attr("x2", (d) => xScale(2050))
-      .attr("y1", (d) => yScale(d["val"]))
-      .attr("y2", (d) => yScale(d["val"]))
-      .attr("fill", "blue")
-      .attr("stroke", "blue")
-      .attr("stroke-width", 2)
-      .attr("stroke-dasharray", 4);
+    //   thresholdg
+    //     .selectAll(".ll97-threshold-line")
+    //     .data(ll97_thresholds[0])
+    //     .join("line")
+    //     .attr("class", "ll97-threshold-line")
+    //     .attr("x1", (d) => xScale(d["period"].split("-")[0]))
+    //     .attr("x2", (d) => xScale(2050))
+    //     .attr("y1", (d) => yScale(d["val"]))
+    //     .attr("y2", (d) => yScale(d["val"]))
+    //     .attr("fill", "blue")
+    //     .attr("stroke", "blue")
+    //     .attr("stroke-width", 2)
+    //     .attr("stroke-dasharray", 4);
+
+    // --- AREA PLOT THRESHOLDS
+    let alternate_position = 2;
+
+    let data = emissions_projections_by_fuel[alternate_position].map((d) => {
+      return {
+        fuel: d.fuel,
+        year: d.year,
+        kg_co2_per_sf: d.kg_co2_per_sf,
+      };
+    });
+
+    let years = [...new Set(data.map((d) => d.year))];
+    let fuel_types = [...new Set(data.map((d) => d.fuel))];
+
+    let prestacked_data = [];
+    years.forEach((year, i) => {
+      let year_obj = {};
+
+      year_obj["year"] = year;
+
+      fuel_types.forEach((fuel) => {
+        year_obj[fuel] = data.filter((d) => {
+          return d.fuel == fuel && d.year == year;
+        })[0]["kg_co2_per_sf"];
+      });
+      prestacked_data.push(year_obj);
+    });
+
+    let stackedData = d3.stack().keys(fuel_types)(prestacked_data);
+
+    var color = d3.scaleOrdinal().domain(fuel_types).range(d3.schemeSet2);
+
+    // Area generator
+    let areaGen = d3
+      .area()
+      .x((d) => xScale(d.data.year))
+      .y0((d) => yScale(d[0]))
+      .y1((d) => yScale(d[1]));
+
+    stackedareag.selectAll(".areas").remove();
+    stackedareag
+      .selectAll(".areas")
+      .data(stackedData)
+      .enter()
+      .append("path")
+      .attr("class", function (d) {
+        return "areas";
+      })
+      .style("fill", function (d) {
+        return color(d.key);
+      })
+      .attr("d", areaGen);
+
+    console.log(stackedData);
   };
 
   return (
