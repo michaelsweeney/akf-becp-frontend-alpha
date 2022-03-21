@@ -3,7 +3,6 @@ const initialState = {
     height: window.innerHeight,
     width: window.innerWidth,
   },
-
 };
 
 export default function uiReducer(state = initialState, action) {
@@ -11,10 +10,9 @@ export default function uiReducer(state = initialState, action) {
     case "SET_WINDOW_DIMENSIONS": {
       return {
         ...state,
-        dims: action.payload
+        dims: action.payload,
       };
     }
-
     default:
       return state;
   }

@@ -6,8 +6,10 @@ import { makeStyles } from "@material-ui/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import * as api from "./apicalls";
-
+import * as d3 from "d3";
 import PlotContainer from "./components/plotcontainer";
+import PlotControls from "./components/plotcontrols";
+
 const theme = createTheme({
   palette: {
     secondary: {
@@ -21,6 +23,27 @@ const theme = createTheme({
 
 const useStyles = makeStyles({
   app: {},
+  main: {
+    display: "block",
+    height: "calc(100vh)",
+    width: "calc(100vw)",
+  },
+  left: {
+    display: "inline-block",
+    width: "300px",
+    height: "100%",
+    verticalAlign: "top",
+  },
+  right: {
+    display: "inline-block",
+    width: "calc(100% - 300px)",
+    height: "100%",
+    verticalAlign: "top",
+  },
+  rightTop: {
+    height: "calc(100% - 200px)",
+  },
+  rightBottom: { height: "200px", verticalAlign: "top" },
 });
 
 const App = (props) => {
@@ -44,9 +67,17 @@ const App = (props) => {
     props.actions.setCaseResults(results);
   };
 
+  const handleRawInputChange = (p) => {
+    console.log(p.target.innerHTML);
+    let input_obj = JSON.parse(p.target.innerHTML);
+    console.log(input_obj);
+    props.actions.setCaseInputs(input_obj);
+    // api.getProjectionFromReferenceBuildings(input_obj, handleCaseChange);
+  };
+
   useEffect(() => {
     api.getProjectionFromReferenceBuildings(case_inputs, handleCaseChange);
-  }, []);
+  }, [case_inputs]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -59,10 +90,22 @@ const App = (props) => {
           api
         </a>
 
-        <PlotContainer />
-
-        <div>{JSON.stringify(case_inputs)}</div>
-        <div>{JSON.stringify(case_results)}</div>
+        <div className={classes.main}>
+          <div className={classes.left}>
+            <pre onBlur={handleRawInputChange} contentEditable="true">
+              {JSON.stringify(case_inputs, undefined, 2)}
+            </pre>
+          </div>
+          <div className={classes.right}>
+            <div className={classes.rightTop}>
+              <PlotContainer />
+            </div>
+            <div className={classes.rightBottom}>
+              <PlotControls />
+            </div>
+          </div>
+        </div>
+        <div></div>
       </div>
     </ThemeProvider>
   );

@@ -13,9 +13,39 @@ export function setCaseInputs(data) {
   };
 }
 
+/* general ui actions */
 export function setWindowDimensions(dims) {
   return {
     type: "SET_WINDOW_DIMENSIONS",
     payload: dims,
+  };
+}
+
+/* plot config options */
+export function setPlotConfig(config) {
+  return {
+    type: "SET_PLOT_CONFIG",
+    payload: config,
+  };
+}
+
+export function setActivePlot(val) {
+  return {
+    type: "SET_ACTIVE_PLOT",
+    payload: val,
+  };
+}
+
+export function setStackedAreaIndex(val) {
+  return {
+    type: "SET_STACKED_AREA_INDEX",
+    payload: val,
+  };
+}
+
+export function setThresholdView(val) {
+  return {
+    type: "SET_THRESHOLD_VIEW",
+    payload: val,
   };
 }
