@@ -21,6 +21,13 @@ export function setWindowDimensions(dims) {
   };
 }
 
+export function setIsLoading(bool) {
+  return {
+    type: "SET_IS_LOADING",
+    payload: bool,
+  };
+}
+
 /* plot config options */
 export function setPlotConfig(config) {
   return {
@@ -49,3 +56,14 @@ export function setThresholdView(val) {
     payload: val,
   };
 }
+
+
+export function setGlobalCaseParameters(obj) {
+  return {
+    type: 'SET_GLOBAL_CASE_PARAMETERS',
+    payload: obj
+  }
+}
+
+
+

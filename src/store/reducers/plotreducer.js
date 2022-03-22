@@ -6,7 +6,7 @@ const initialState = {
   */
   activePlot: "multiline",
   stackedAreaIndex: 0,
-  thresholdView: "berdo",
+  thresholdView: "none",
 };
 
 export default function plotReducer(state = initialState, action) {

@@ -9,6 +9,8 @@ import * as api from "./apicalls";
 import * as d3 from "d3";
 import PlotContainer from "./components/plotcontainer";
 import PlotControls from "./components/plotcontrols";
+import ApiControls from './components/apicontrols'
+import { LoadingSpinner } from "./components/loadingspinner";
 
 const theme = createTheme({
   palette: {
@@ -22,8 +24,8 @@ const theme = createTheme({
 });
 
 const useStyles = makeStyles({
-  app: {},
   main: {
+    padding: 25,
     display: "block",
     height: "calc(100vh)",
     width: "calc(100vw)",
@@ -40,17 +42,15 @@ const useStyles = makeStyles({
     height: "100%",
     verticalAlign: "top",
   },
-  rightTop: {
-    height: "calc(100% - 200px)",
-  },
-  rightBottom: { height: "200px", verticalAlign: "top" },
 });
+
+
+
 
 const App = (props) => {
   const classes = useStyles();
   let { case_inputs, case_results } = props.cases;
-
-  // handle resize
+  let { isLoading } = props.ui
   useEffect(() => {
     const handleResize = () => {
       props.actions.setWindowDimensions({
@@ -63,46 +63,44 @@ const App = (props) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [props.actions]);
 
-  const handleCaseChange = (results) => {
-    props.actions.setCaseResults(results);
-  };
+  const updateResults = () => {
+    api.getProjectionFromReferenceBuildings(props.cases.case_inputs, props.actions.setCaseResults, props.actions.setIsLoading);
+  }
 
   const handleRawInputChange = (p) => {
-    console.log(p.target.innerHTML);
     let input_obj = JSON.parse(p.target.innerHTML);
-    console.log(input_obj);
     props.actions.setCaseInputs(input_obj);
-    // api.getProjectionFromReferenceBuildings(input_obj, handleCaseChange);
   };
 
   useEffect(() => {
-    api.getProjectionFromReferenceBuildings(case_inputs, handleCaseChange);
-  }, [case_inputs]);
+    updateResults();
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
+      <LoadingSpinner isLoading={isLoading} />
       <div className={classes.app}>
-        <a
-          target="_blank"
-          rel="noopener"
-          href="https://akf-becp-pyapi.herokuapp.com/"
-        >
-          api
-        </a>
-
         <div className={classes.main}>
           <div className={classes.left}>
+            <h5>Case Controls</h5>
+            <ApiControls />
+            <div style={{ margin: 10 }}>
+              <a target="_blank" rel="noopener" href="https://akf-becp-pyapi.herokuapp.com/">view api</a>
+            </div>
+            <h5>Plot Controls</h5>
+
+            <PlotControls />
+            <h5>Raw editable (use at your own risk)</h5>
+
             <pre onBlur={handleRawInputChange} contentEditable="true">
               {JSON.stringify(case_inputs, undefined, 2)}
             </pre>
           </div>
           <div className={classes.right}>
-            <div className={classes.rightTop}>
-              <PlotContainer />
-            </div>
-            <div className={classes.rightBottom}>
-              <PlotControls />
-            </div>
+
+            <PlotContainer />
+
+
           </div>
         </div>
         <div></div>
@@ -115,6 +113,7 @@ const mapStateToProps = (store) => {
   return {
     actions: { ...store.actions },
     cases: { ...store.cases },
+    ui: { ...store.ui }
   };
 };
 

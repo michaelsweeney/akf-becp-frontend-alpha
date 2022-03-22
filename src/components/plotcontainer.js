@@ -62,10 +62,16 @@ const PlotContainer = (props) => {
         : props.window.dims.height - 200,
     };
 
+    containerdims = {
+      width: 700,
+      height: 700
+    }
+
     let chartdims = {
       width: containerdims.width - margins.l - margins.r,
       height: containerdims.height - margins.t - margins.b,
     };
+
 
     let svg = d3
       .select(node)
@@ -271,8 +277,14 @@ const PlotContainer = (props) => {
       };
     });
 
+
+
     let years = [...new Set(data.map((d) => d.year))];
     let fuel_types = [...new Set(data.map((d) => d.fuel))];
+    if (fuel_types.length > 1) {
+      fuel_types = [fuel_types[1], fuel_types[0]] // << reverse order, manual for gas / elec only.s
+    }
+
 
     let prestacked_data = [];
     years.forEach((year, i) => {
@@ -392,8 +404,7 @@ const PlotContainer = (props) => {
       .attr("class", "x-axis-title-g")
       .attr(
         "transform",
-        `translate(${margins.l / 2},${
-          margins.t + chartdims.height / 2
+        `translate(${margins.l / 2},${margins.t + chartdims.height / 2
         })rotate(-90)`
       )
       .attr("text-anchor", "middle")

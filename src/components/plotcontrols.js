@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 
 import { makeStyles } from "@material-ui/styles";
+import { SingleSelect } from "./singleselect";
 
 const useStyles = makeStyles({
   root: {},
@@ -35,59 +36,38 @@ const PlotControls = (props) => {
   };
   return (
     <div>
-      <div className={classes.selectContainer}>
-        <FormControl fullWidth>
-          <InputLabel id="plot-type-selector">Plot Type</InputLabel>
-          <Select
-            labelId="plot-type-selector"
-            value={plot_config.activePlot}
-            label="Plot Type"
-            onChange={handlePlotTypeSelectChange}
-          >
-            <MenuItem value="multiline">Multi-Line</MenuItem>
-            <MenuItem value="stacked">Stacked by Fuel</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
-      <div className={classes.selectContainer}>
-        <FormControl fullWidth>
-          <InputLabel id="threshold-type-selector">
-            Threshold Overlay
-          </InputLabel>
-          <Select
-            labelId="threshold-type-selector"
-            value={plot_config.thresholdView}
-            label="Threshold Type Selector"
-            onChange={handleThresholdTypeSelector}
-          >
-            <MenuItem value="none">None</MenuItem>
-            <MenuItem value="berdo">BERDO</MenuItem>
-            <MenuItem value="ll97">LL97</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
 
-      <div className={classes.selectContainer}>
-        <FormControl fullWidth>
-          <InputLabel id="stacked-index-selector">
-            Stacked Index Selector
-          </InputLabel>
-          <Select
-            labelId="stacked-index-selector"
-            value={plot_config.stackedAreaIndex}
-            label="Threshold Type Selector"
-            onChange={handleStackedIndexSelector}
-          >
-            {cases.case_inputs.map((e, i) => {
-              return (
-                <MenuItem key={i} value={i}>
-                  {e.name}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-      </div>
+      <SingleSelect
+        id='plot-type-selector'
+        value={plot_config.activePlot}
+        label="Plot Type"
+        callback={handlePlotTypeSelectChange}
+        optionvalues={['multiline', 'stacked']}
+        optiontitles={['Multiline', 'Stacked by Fuel']}
+      />
+
+      {plot_config.activePlot == 'stacked' ? (
+        <SingleSelect
+          id="stacked-index-selector"
+          label="Stacked Index Selector"
+          value={plot_config.stackedAreaIndex}
+          callback={handleStackedIndexSelector}
+          optionvalues={cases.case_inputs.map((e, i) => i)}
+          optiontitles={cases.case_inputs.map((e, i) => e.name)}
+
+        />) :
+        <div></div>
+      }
+
+      <SingleSelect
+        id="threshold-type-selector"
+        label="Threshold Overlay"
+        callback={handleThresholdTypeSelector}
+        value={plot_config.thresholdView}
+        optionvalues={['none', 'berdo', 'll97']}
+        optiontitles={['None', 'BERDO', 'LL97']}
+      />
+
     </div>
   );
 };

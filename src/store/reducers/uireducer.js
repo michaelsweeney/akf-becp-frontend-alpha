@@ -3,6 +3,7 @@ const initialState = {
     height: window.innerHeight,
     width: window.innerWidth,
   },
+  isLoading: false,
 };
 
 export default function uiReducer(state = initialState, action) {
@@ -12,6 +13,13 @@ export default function uiReducer(state = initialState, action) {
         ...state,
         dims: action.payload,
       };
+    }
+
+    case "SET_IS_LOADING": {
+      return {
+        ...state,
+        isLoading: action.payload
+      }
     }
     default:
       return state;
