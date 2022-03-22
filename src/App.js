@@ -90,11 +90,11 @@ const App = (props) => {
             <h5>Plot Controls</h5>
 
             <PlotControls />
-            <h5>Raw editable (use at your own risk)</h5>
+            {/*<h5>Raw editable (use at your own risk)</h5>
 
             <pre onBlur={handleRawInputChange} contentEditable="true">
               {JSON.stringify(case_inputs, undefined, 2)}
-            </pre>
+  </pre>*/}
           </div>
           <div className={classes.right}>
 

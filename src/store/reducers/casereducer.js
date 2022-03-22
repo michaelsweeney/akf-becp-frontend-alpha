@@ -91,7 +91,6 @@ export default function buildingReducer(state = initialState, action) {
         }
       })
 
-      console.log(modified_inputs)
       return {
         ...state,
         modified_inputs

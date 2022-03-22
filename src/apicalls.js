@@ -1,10 +1,14 @@
+
+import { TryRounded } from '@mui/icons-material';
+import { store } from './store'
+
 const url = "https://akf-becp-pyapi.herokuapp.com/";
 // const url = "http://localhost:5000";
 
 
 export const states = ["AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
 
-export const climate_zones = ["4C", "3C", "5A", "6A", "1A", "7A", "2B", "8A", "3B", "4A", "4B", "3A", "2A", "6B", "5B"]
+export const climate_zones = ["1A", "2A", "2B", "3A", "3B", "3C", "4A", "4B", "4C", "5A", "5B", "6A", "6B", "7A", "8A",]
 
 export const cambium_cases = ["HighRECost", "LowRECost", "MidCase", "MidCase95by2035", "MidCase95by2050"]
 
@@ -52,8 +56,9 @@ export const ref_bldg_to_ll97_type = {
   HighriseApartment: "R2",
 };
 
-async function getProjectionFromReferenceBuildings(alternates, callback, loadingCallback) {
-  loadingCallback(true)
+async function getProjectionFromReferenceBuildings(alternates, resultsCallback, isLoadingCallback) {
+  isLoadingCallback(true)
+
   let projection_results = [];
 
   async function getQueryResults(params, subdirectory) {
@@ -139,8 +144,9 @@ async function getProjectionFromReferenceBuildings(alternates, callback, loading
       payment_sum += e["val"];
     });
   });
-  callback(projection_results);
-  loadingCallback(false)
+  resultsCallback(projection_results);
+
+  isLoadingCallback(false)
 }
 
 async function getQueryNoParameters(sub) {
@@ -155,6 +161,8 @@ async function getAllStates() {
   let result = await getQueryNoParameters('get_all_states')
   return result
 }
+
+
 
 
 
