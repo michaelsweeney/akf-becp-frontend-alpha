@@ -179,7 +179,7 @@ export const createMultiLineChart = (config) => {
   // // optimization not working.
   let spaced_multiline_icon_annotation_positions = getIdealSpacing(
     multiline_icon_annotation_positions,
-    40
+    25
   );
   // console.log(multiline_icon_annotation_positions);
 
