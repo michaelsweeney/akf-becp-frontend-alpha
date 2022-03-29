@@ -1,18 +1,16 @@
 import * as d3 from "d3";
 import { color } from "d3";
 
-import {
-  HeatPumpIconPath,
-  ElectricityIconPath,
-  GasIconPath,
-} from "./plots/svgicons";
+import { HeatPumpIconPath, ElectricityIconPath, GasIconPath } from "./svgicons";
 
 import { useRef, useEffect } from "react";
 
-import { conn } from "../store/connect";
+import { conn } from "../../store/connect";
 
-import { createMultiLineChart } from "./plots/multiline";
-import { createStackedAreaChart } from "./plots/stackedarea";
+import { createMultiLineChart } from "./multiline";
+import { createStackedAreaChart } from "./stackedarea";
+
+import { getIdealSpacing } from "./spacing";
 
 const PlotContainer = (props) => {
   const container = useRef(null);
@@ -35,7 +33,7 @@ const PlotContainer = (props) => {
     let margins = {
       t: 50,
       b: 200,
-      r: 50,
+      r: 100,
       l: 50,
     };
 
@@ -156,11 +154,17 @@ const PlotContainer = (props) => {
       .join("g")
       .attr("class", "annotation-g");
 
+    let hover_g = svg
+      .selectAll(".hover-g")
+      .data([0])
+      .join("g")
+      .attr("class", "hover-g");
+
     let xScale = d3.scaleTime().range([0, chartdims.width]).domain(domain_x);
     let yScale = d3.scaleLinear().range([0, chartdims.height]).domain(domain_y);
 
     let {
-      multilineg: multiline_g,
+      multiline_g,
       multiline_legend_g,
       multiline_ll97_g,
       multiline_berdo_g,
@@ -175,6 +179,7 @@ const PlotContainer = (props) => {
       rightborder_g,
       topborder_g,
       annotation_g,
+      hover_g,
       legend_g,
       case_results,
       plot_config,
@@ -203,26 +208,6 @@ const PlotContainer = (props) => {
       xScale,
       yScale,
     });
-
-    //// --- LEGENDS
-
-    // multiline g
-
-    // let multiline_legend_case_lines = multiline_legend_g
-    //   .selectAll(".multiline-legend-case-line")
-    //   .data(case_results)
-    //   .join("line")
-    //   .attr("class", "multiline-legend-case-line")
-    //   .attr("x1", 0)
-    //   .attr("x2", 30)
-    //   .attr("y1", (d, i) => 30 * i)
-    //   .attr("y2", (d, i) => 30 * i)
-    //   .attr("stroke", (d, i) => colorScale[i])
-    //   .attr("stroke-width", 3);
-
-    // stacked area g
-
-    // AXIS LABELS & TITLES
 
     // VIEW TOGGLE
     if (activePlot === "multiline") {

@@ -7,11 +7,12 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import * as api from "./apicalls";
 import * as d3 from "d3";
-import PlotContainer from "./components/plotcontainer";
+import PlotContainer from "./components/plots/plotcontainer";
 import PlotControls from "./components/plotcontrols";
 import ApiControls from "./components/apicontrols";
 import { LoadingSpinner } from "./components/loadingspinner";
 import { LoadingScreenError } from "./components/loadingerrorscreen";
+
 const theme = createTheme({
   palette: {
     secondary: {
@@ -47,7 +48,6 @@ const useStyles = makeStyles({
 const App = (props) => {
   const classes = useStyles();
   let { case_inputs, case_results, isLoadingError } = props.cases;
-  console.log(isLoadingError);
   let { isLoading } = props.ui;
   useEffect(() => {
     const handleResize = () => {
