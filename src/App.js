@@ -9,9 +9,9 @@ import * as api from "./apicalls";
 import * as d3 from "d3";
 import PlotContainer from "./components/plotcontainer";
 import PlotControls from "./components/plotcontrols";
-import ApiControls from './components/apicontrols'
+import ApiControls from "./components/apicontrols";
 import { LoadingSpinner } from "./components/loadingspinner";
-
+import { LoadingScreenError } from "./components/loadingerrorscreen";
 const theme = createTheme({
   palette: {
     secondary: {
@@ -44,13 +44,11 @@ const useStyles = makeStyles({
   },
 });
 
-
-
-
 const App = (props) => {
   const classes = useStyles();
-  let { case_inputs, case_results } = props.cases;
-  let { isLoading } = props.ui
+  let { case_inputs, case_results, isLoadingError } = props.cases;
+  console.log(isLoadingError);
+  let { isLoading } = props.ui;
   useEffect(() => {
     const handleResize = () => {
       props.actions.setWindowDimensions({
@@ -64,12 +62,11 @@ const App = (props) => {
   }, [props.actions]);
 
   const updateResults = () => {
-    api.getProjectionFromReferenceBuildings(props.cases.case_inputs, props.actions.setCaseResults, props.actions.setIsLoading);
-  }
-
-  const handleRawInputChange = (p) => {
-    let input_obj = JSON.parse(p.target.innerHTML);
-    props.actions.setCaseInputs(input_obj);
+    api.getProjectionFromReferenceBuildings(
+      props.cases.case_inputs,
+      props.actions.setCaseResults,
+      props.actions.setIsLoading
+    );
   };
 
   useEffect(() => {
@@ -84,8 +81,14 @@ const App = (props) => {
           <div className={classes.left}>
             <h5>Case Controls</h5>
             <ApiControls />
-            <div style={{ margin: 10 }}>
-              <a target="_blank" rel="noopener" href="https://akf-becp-pyapi.herokuapp.com/">view api</a>
+            <div style={{ margin: 10, marginLeft: 20 }}>
+              <a
+                target="_blank"
+                rel="noopener"
+                href="https://akf-becp-pyapi.herokuapp.com/"
+              >
+                view api
+              </a>
             </div>
             <h5>Plot Controls</h5>
 
@@ -97,10 +100,7 @@ const App = (props) => {
   </pre>*/}
           </div>
           <div className={classes.right}>
-
-            <PlotContainer />
-
-
+            {isLoadingError ? <LoadingScreenError /> : <PlotContainer />}
           </div>
         </div>
         <div></div>
@@ -113,7 +113,7 @@ const mapStateToProps = (store) => {
   return {
     actions: { ...store.actions },
     cases: { ...store.cases },
-    ui: { ...store.ui }
+    ui: { ...store.ui },
   };
 };
 
