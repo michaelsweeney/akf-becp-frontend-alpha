@@ -29,7 +29,8 @@ const useStyles = makeStyles({
     padding: 25,
     display: "block",
     height: "calc(100vh)",
-    width: "calc(100vw)",
+    width: "calc(100vw - 50px)",
+    boxSizing: "border-box",
   },
   left: {
     display: "inline-block",

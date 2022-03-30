@@ -26,6 +26,7 @@ export const createMultiLineChart = (config) => {
   } = config;
 
   let colorScale = d3.schemeTableau10;
+
   let transition_duration = 500;
 
   let multiline_legend_icon_svg = [
@@ -67,13 +68,9 @@ export const createMultiLineChart = (config) => {
   xaxis_g.transition().duration(transition_duration).call(xAxis);
   yaxis_g.transition().duration(transition_duration).call(yAxis);
 
-  rightborder_g
-    .call(d3.axisRight().scale(yScale).ticks(0).tickSizeOuter(0))
-    .style("stroke-width", 2);
+  rightborder_g.call(d3.axisRight().scale(yScale).ticks(0).tickSizeOuter(0));
 
-  topborder_g
-    .call(d3.axisTop().scale(xScale).ticks(0).tickSizeOuter(0))
-    .style("stroke-width", 2);
+  topborder_g.call(d3.axisTop().scale(xScale).ticks(0).tickSizeOuter(0));
 
   let lineGen = d3
     .line()
@@ -176,14 +173,10 @@ export const createMultiLineChart = (config) => {
   let multiline_icon_annotation_positions =
     multiline_icon_annotation_values.map((d) => yScale(d));
 
-  // // optimization not working.
   let spaced_multiline_icon_annotation_positions = getIdealSpacing(
     multiline_icon_annotation_positions,
-    25
+    30
   );
-  // console.log(multiline_icon_annotation_positions);
-
-  // console.log(spaced_multiline_icon_annotation_positions);
 
   let multiline_icon_annotations = annotation_g
     .selectAll(".multiline-icon-annotation")
@@ -196,21 +189,6 @@ export const createMultiLineChart = (config) => {
     .duration(transition_duration)
     .attr("transform", (d, i) => {
       return `translate(${chartdims.width + margins.l + 15}, ${
-        margins.t + d - 10
-      }) scale(1.25 1.25)`;
-    });
-
-  let multiline_icon_annotations_test = annotation_g
-    .selectAll(".multiline-icon-annotation-test")
-    .data(multiline_icon_annotation_positions)
-    .join("path")
-    .attr("class", "multiline-icon-annotation-test")
-    .attr("d", (d, i) => multiline_legend_icon_svg[i])
-    .attr("fill", (d, i) => colorScale[i])
-    .transition()
-    .duration(transition_duration)
-    .attr("transform", (d, i) => {
-      return `translate(${chartdims.width + margins.l + 40}, ${
         margins.t + d - 10
       }) scale(1.25 1.25)`;
     });
@@ -243,26 +221,81 @@ export const createMultiLineChart = (config) => {
     .text("Carbon Intensity (kg/sf/yr)")
     .style("font-weight", 600);
 
-  // hover_g
-  //   .selectAll(".hover-line")
-  //   .data([0])
-  //   .join("line")
-  //   .attr("class", "hover-line")
-  //   .attr("transform", `translate(${margins.l},${margins.t})`)
-  //   .attr("x1", xScale(2040))
-  //   .attr("x2", xScale(2040))
-  //   .attr("y1", yScale(yScale.domain()[0]))
-  //   .attr("y2", yScale(yScale.domain()[1]))
-  //   .attr("fill", "red")
-  //   .attr("stroke-width", 2)
-  //   .attr("stroke", "black")
-  //   .attr("opacity", 0);
+  // hacky flatten for hover circles
 
-  plot_g.on("mousemove", function () {
-    // console.log(this);
-    // this.selectAll(".hover-line").attr("opacity", 1);
+  let emissions_projections_flat = [
+    ...emissions_projections[0].map((d) => {
+      return {
+        ...d,
+        name: case_results[0].name,
+        nameidx: 0,
+      };
+    }),
+    ...emissions_projections[1].map((d) => {
+      return {
+        ...d,
+        name: case_results[1].name,
+        nameidx: 1,
+      };
+    }),
+    ...emissions_projections[2].map((d) => {
+      return {
+        ...d,
+        name: case_results[2].name,
+        nameidx: 2,
+      };
+    }),
+  ];
+
+  let hover_line = hover_g
+    .selectAll(".hover-line")
+    .data([0])
+    .join("line")
+    .attr("class", "hover-line")
+    .attr("x1", xScale(2040))
+    .attr("x2", xScale(2040))
+    .attr("y1", yScale(yScale.domain()[0]))
+    .attr("y2", yScale(yScale.domain()[1]))
+    .attr("fill", "red")
+    .attr("stroke-width", 2)
+    .attr("stroke", "black")
+    .attr("stroke-dasharray", 2)
+    .attr("opacity", 0);
+  let hover_circles = hover_g
+    .selectAll(".hover-circle")
+    .data(emissions_projections_flat)
+    .join("circle")
+    .attr("class", "hover-circle")
+    .attr("r", 4)
+    .attr("cx", (d) => xScale(d.year))
+    .attr("cy", (d) => yScale(d.kg_co2_per_sf))
+    .attr("fill", (d, i) => colorScale[d.nameidx])
+    .attr("opacity", 0);
+  let hover_rect = hover_g
+    .selectAll(".hover-rect")
+    .data([0])
+    .join("rect")
+    .attr("class", "hover-rect")
+    .attr("width", chartdims.width)
+    .attr("height", chartdims.height)
+    .attr("opacity", 0);
+
+  hover_rect.on("mousemove", function (e) {
+    let mouse = d3.pointer(e);
+    let xval = xScale.invert(mouse[0]);
+    let years = emissions_projections[0].map((d) => d.year);
+    let xval_bisect = d3.bisectLeft(years, xval);
+    let selected_year = years[xval_bisect];
+    hover_line
+      .attr("opacity", 1)
+      .attr("x1", xScale(selected_year))
+      .attr("x2", xScale(selected_year));
+    hover_circles.attr("opacity", (d) => (d.year == selected_year ? 1 : 0));
   });
 
+  svg.on("mouseleave", function (e) {
+    hover_line.attr("opacity", 0);
+  });
   return {
     multiline_g,
     multiline_ll97_g,

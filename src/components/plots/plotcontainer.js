@@ -79,6 +79,7 @@ const PlotContainer = (props) => {
     ];
 
     let domain_x = [2022, 2050];
+
     let chartdims = {
       width: containerdims.width - margins.l - margins.r,
       height: containerdims.height - margins.t - margins.b,
@@ -158,9 +159,10 @@ const PlotContainer = (props) => {
       .selectAll(".hover-g")
       .data([0])
       .join("g")
-      .attr("class", "hover-g");
+      .attr("class", "hover-g")
+      .attr("transform", `translate(${margins.l},${margins.t})`);
 
-    let xScale = d3.scaleTime().range([0, chartdims.width]).domain(domain_x);
+    let xScale = d3.scaleLinear().range([0, chartdims.width]).domain(domain_x);
     let yScale = d3.scaleLinear().range([0, chartdims.height]).domain(domain_y);
 
     let {

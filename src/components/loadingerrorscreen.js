@@ -12,7 +12,9 @@ export const LoadingScreenError = () => {
         // padding: 100,
       }}
     >
-      <h4>API Loading Error. Select a different simulation configuration.</h4>
+      <h4>
+        Simulation configuration not found. Try selecting different parameters.
+      </h4>
     </div>
   );
 };
