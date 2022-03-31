@@ -221,6 +221,8 @@ export const createMultiLineChart = (config) => {
     .text("Carbon Intensity (kg/sf/yr)")
     .style("font-weight", 600);
 
+  /* -- HOVER EVENTS -- */
+
   // hacky flatten for hover circles
 
   let emissions_projections_flat = [
@@ -261,6 +263,7 @@ export const createMultiLineChart = (config) => {
     .attr("stroke", "black")
     .attr("stroke-dasharray", 2)
     .attr("opacity", 0);
+
   let hover_circles = hover_g
     .selectAll(".hover-circle")
     .data(emissions_projections_flat)
@@ -271,6 +274,44 @@ export const createMultiLineChart = (config) => {
     .attr("cy", (d) => yScale(d.kg_co2_per_sf))
     .attr("fill", (d, i) => colorScale[d.nameidx])
     .attr("opacity", 0);
+
+  let rect_width = 200;
+  let rect_height = 100;
+
+  let hover_info_g = hover_g
+    .selectAll(".hover-info-g")
+    .data([0])
+    .join("g")
+    .attr("class", "hover-info-g");
+
+  let hover_info_rect = hover_info_g
+    .selectAll(".hover-info-rect")
+    .data([0])
+    .join("rect")
+    .attr("class", "hover-info-rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("height", rect_height)
+    .attr("width", rect_width)
+    .attr("fill", "gray")
+    .attr("opacity", 0.5)
+    .attr("rx", 15);
+
+  let hover_info_text = hover_info_g
+    .selectAll(".hover-info-text")
+    .data(emissions_projections)
+    .join("text")
+    .attr("class", "hover-info-text")
+    .attr("x", 15)
+    .attr("y", (d, i) => i * 15 + 25)
+    .html((d, i) => {
+      console.log(i);
+      console.log(d);
+      console.log("----");
+      return "hey";
+    });
+
+  // this needs to be the last item appended
   let hover_rect = hover_g
     .selectAll(".hover-rect")
     .data([0])
@@ -282,20 +323,35 @@ export const createMultiLineChart = (config) => {
 
   hover_rect.on("mousemove", function (e) {
     let mouse = d3.pointer(e);
-    let xval = xScale.invert(mouse[0]);
+    let mouseX = mouse[0];
+    let mouseY = mouse[1];
+    let xval = xScale.invert(mouseX);
+
     let years = emissions_projections[0].map((d) => d.year);
     let xval_bisect = d3.bisectLeft(years, xval);
     let selected_year = years[xval_bisect];
+
     hover_line
       .attr("opacity", 1)
       .attr("x1", xScale(selected_year))
       .attr("x2", xScale(selected_year));
+
+    hover_info_g.attr("opacity", 1).attr(
+      "transform",
+      `translate(
+        ${mouseX - (mouseX / chartdims.width) * rect_width}
+        ,
+        ${mouseY - rect_height - 10})`
+    );
+
     hover_circles.attr("opacity", (d) => (d.year == selected_year ? 1 : 0));
   });
 
   svg.on("mouseleave", function (e) {
     hover_line.attr("opacity", 0);
+    hover_info_g.attr("opacity", 0);
   });
+
   return {
     multiline_g,
     multiline_ll97_g,

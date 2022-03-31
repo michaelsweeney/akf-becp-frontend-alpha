@@ -84,11 +84,6 @@ export const getIdealSpacing = (arr, spacing) => {
     let pos = original_position_array.filter((d) => d.pos == i)[0].new_val;
     spaced_arr_reordered.push(pos);
   });
-  console.log("---------");
-  console.log(arr);
-  console.log(idx_obj_array);
-  console.log(spaced_arr_reordered);
-  console.log(original_position_array);
 
   return spaced_arr_reordered;
 };
