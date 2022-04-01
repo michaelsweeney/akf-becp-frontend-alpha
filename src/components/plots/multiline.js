@@ -275,8 +275,8 @@ export const createMultiLineChart = (config) => {
     .attr("fill", (d, i) => colorScale[d.nameidx])
     .attr("opacity", 0);
 
-  let rect_width = 200;
-  let rect_height = 100;
+  let rect_width = 325;
+  let rect_height = 125;
 
   let hover_info_g = hover_g
     .selectAll(".hover-info-g")
@@ -294,8 +294,18 @@ export const createMultiLineChart = (config) => {
     .attr("height", rect_height)
     .attr("width", rect_width)
     .attr("fill", "gray")
-    .attr("opacity", 0.5)
+    .attr("opacity", 0.9)
     .attr("rx", 15);
+
+  let hover_info_year_text = hover_info_g
+    .selectAll(".hover-info-year-text")
+    .data([0])
+    .join("text")
+    .attr("class", "hover-info-year-text")
+    .attr("x", 15)
+    .attr("y", 30)
+    .html("")
+    .attr("font-weight", 700);
 
   let hover_info_text = hover_info_g
     .selectAll(".hover-info-text")
@@ -303,13 +313,8 @@ export const createMultiLineChart = (config) => {
     .join("text")
     .attr("class", "hover-info-text")
     .attr("x", 15)
-    .attr("y", (d, i) => i * 15 + 25)
-    .html((d, i) => {
-      console.log(i);
-      console.log(d);
-      console.log("----");
-      return "hey";
-    });
+    .attr("y", (d, i) => i * 20 + 60)
+    .html("");
 
   // this needs to be the last item appended
   let hover_rect = hover_g
@@ -345,6 +350,17 @@ export const createMultiLineChart = (config) => {
     );
 
     hover_circles.attr("opacity", (d) => (d.year == selected_year ? 1 : 0));
+
+    hover_info_year_text.text(selected_year);
+    hover_info_text.text((d, i) => {
+      let year = selected_year;
+      let simname = case_results[i].name;
+      let val = d3.format(".2f")(
+        d.filter((a) => a.year === year)[0]["kg_co2_per_sf"]
+      );
+      console.log(year, val, simname);
+      return `${simname}: ${val} kg/sf/yr`;
+    });
   });
 
   svg.on("mouseleave", function (e) {
