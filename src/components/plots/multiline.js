@@ -295,7 +295,7 @@ export const createMultiLineChart = (config) => {
     .attr("width", rect_width)
     .attr("fill", "gray")
     .attr("opacity", 0.9)
-    .attr("rx", 15);
+    .attr("rx", 0);
 
   let hover_info_year_text = hover_info_g
     .selectAll(".hover-info-year-text")
@@ -305,7 +305,8 @@ export const createMultiLineChart = (config) => {
     .attr("x", 15)
     .attr("y", 30)
     .html("")
-    .attr("font-weight", 700);
+    .attr("font-weight", 700)
+    .attr("fill", "white");
 
   let hover_info_text = hover_info_g
     .selectAll(".hover-info-text")
@@ -314,7 +315,8 @@ export const createMultiLineChart = (config) => {
     .attr("class", "hover-info-text")
     .attr("x", 15)
     .attr("y", (d, i) => i * 20 + 60)
-    .html("");
+    .html("")
+    .attr("fill", "white");
 
   // this needs to be the last item appended
   let hover_rect = hover_g

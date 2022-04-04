@@ -41,10 +41,7 @@ export const getIdealSpacing = (arr, spacing) => {
     let overlap_prev = isOverlapping(prev_val, next_val, spacing);
     let is_overlap = overlap_next || overlap_prev;
 
-    // iterate and increment (should figure out how / when to decrement current instead of increment next (would need to make sure previous value is ok))
     while (is_overlap) {
-      // should i increment next val or decrement current val
-
       let current_val_decrement_test = current_val - increment_value;
       let overlaps_previous_decrement_test = isOverlapping(
         prev_val,
