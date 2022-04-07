@@ -73,12 +73,13 @@ export const climate_zones = [
   "8A",
 ];
 
-export const cambium_cases = [
+export const coefficient_cases = [
   "HighRECost",
   "LowRECost",
   "MidCase",
   "MidCase95by2035",
   "MidCase95by2050",
+  "BERDO",
 ];
 
 export const ashrae_standards = [
@@ -160,6 +161,7 @@ async function getProjectionFromReferenceBuildings(
   async function getQueryResults(params, subdirectory) {
     let endpoint = `${url}/${subdirectory}?params=${JSON.stringify(params)}`;
     let response = await fetch(endpoint, {});
+
     let resjson = await response.json();
     return resjson;
   }

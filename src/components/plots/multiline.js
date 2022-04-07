@@ -282,7 +282,8 @@ export const createMultiLineChart = (config) => {
     .selectAll(".hover-info-g")
     .data([0])
     .join("g")
-    .attr("class", "hover-info-g");
+    .attr("class", "hover-info-g")
+    .attr("opacity", 0);
 
   let hover_info_rect = hover_info_g
     .selectAll(".hover-info-rect")
@@ -360,7 +361,6 @@ export const createMultiLineChart = (config) => {
       let val = d3.format(".2f")(
         d.filter((a) => a.year === year)[0]["kg_co2_per_sf"]
       );
-      console.log(year, val, simname);
       return `${simname}: ${val} kg/sf/yr`;
     });
   });

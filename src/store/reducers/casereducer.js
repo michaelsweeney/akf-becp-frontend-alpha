@@ -1,6 +1,9 @@
 const initialState = {
   case_inputs: [
     {
+      id: 0,
+      is_displayed: true,
+      starting_template: "elec_ashp",
       name: "Air Source HP Heating",
       state: "NY",
       climate_zone: "5A",
@@ -18,6 +21,9 @@ const initialState = {
       ],
     },
     {
+      id: 1,
+      is_displayed: true,
+      starting_template: "elec_resistance",
       name: "Electric Resistance Heating",
       state: "NY",
       climate_zone: "5A",
@@ -35,6 +41,9 @@ const initialState = {
       ],
     },
     {
+      id: 2,
+      is_displayed: true,
+      starting_template: "ng_furnace",
       name: "NG Heating",
       state: "NY",
       climate_zone: "5A",

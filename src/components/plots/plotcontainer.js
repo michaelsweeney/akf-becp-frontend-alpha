@@ -32,15 +32,19 @@ const PlotContainer = (props) => {
 
     let margins = {
       t: 50,
-      b: 200,
+      b: 150,
       r: 100,
       l: 50,
     };
-
     let containerdims = {
       width: 700,
-      height: 700,
+      height: 500,
     };
+    if (node) {
+      let { width, height } = node.getBoundingClientRect();
+      containerdims["width"] = width;
+      containerdims["height"] = height;
+    }
 
     let emissions_projections = case_results.map(
       (d) => d["case_results"]["emissions_projection"]

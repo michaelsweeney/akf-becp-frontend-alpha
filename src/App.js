@@ -8,8 +8,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import * as api from "./apicalls";
 import * as d3 from "d3";
 import PlotContainer from "./components/plots/plotcontainer";
-import PlotControls from "./components/plotcontrols";
-import ApiControls from "./components/apicontrols";
+// import PlotControls from "./components/plotcontrols";
+import CaseControls from "./components/casecontrols";
+import GlobalControls from "./components/globalcontrols";
 import { LoadingSpinner } from "./components/loadingspinner";
 import { LoadingScreenError } from "./components/loadingerrorscreen";
 
@@ -25,24 +26,57 @@ const theme = createTheme({
 });
 
 const useStyles = makeStyles({
-  main: {
-    padding: 25,
-    display: "block",
+  root: {
+    width: "calc(100vw)",
     height: "calc(100vh)",
-    width: "calc(100vw - 50px)",
     boxSizing: "border-box",
   },
-  left: {
-    display: "inline-block",
-    width: "300px",
+  main: {
+    width: "100%",
     height: "100%",
+    // border: "black solid 1px",
+    boxSizing: "border-box",
+    padding: 10,
+  },
+  top: {
+    display: "block",
+    height: "calc(100% - 150px)",
+    width: "calc(100%)",
+    boxSizing: "border-box",
+    padding: 10,
+  },
+  topLeft: {
+    padding: 10,
+    display: "inline-block",
+    width: "250px",
+    height: "100%",
+    // border: "black solid 1px",
+    boxSizing: "border-box",
+    overflowY: "scroll",
     verticalAlign: "top",
   },
-  right: {
+  topRight: {
     display: "inline-block",
-    width: "calc(100% - 300px)",
+    width: "calc(100% - 250px)",
     height: "100%",
+    // border: "black solid 1px",
+    boxSizing: "border-box",
     verticalAlign: "top",
+  },
+
+  bottom: {
+    padding: 10,
+    height: "150px",
+    width: "calc(100%)",
+    boxSizing: "border-box",
+  },
+  bottomMain: {
+    display: "inline-block",
+    width: "calc(100%)",
+    height: "100%",
+    boxSizing: "border-box",
+
+    // border: "black solid 1px",
   },
 });
 
@@ -76,35 +110,33 @@ const App = (props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <LoadingSpinner isLoading={isLoading} />
-      <div className={classes.app}>
+      <div className={classes.root}>
         <div className={classes.main}>
-          <div className={classes.left}>
-            <h5>Case Controls</h5>
-            <ApiControls />
-            <div style={{ margin: 10, marginLeft: 20 }}>
-              <a
-                target="_blank"
-                rel="noopener"
-                href="https://akf-becp-pyapi.herokuapp.com/"
-              >
-                view api
-              </a>
+          <LoadingSpinner isLoading={isLoading} />
+          <div className={classes.top}>
+            <div className={classes.topLeft}>
+              <h5>Global Controls</h5>
+              <GlobalControls />
+              <div style={{ margin: 10, marginLeft: 20 }}>
+                <a
+                  target="_blank"
+                  rel="noopener"
+                  href="https://akf-becp-pyapi.herokuapp.com/"
+                >
+                  view api
+                </a>
+              </div>
             </div>
-            <h5>Plot Controls</h5>
-
-            <PlotControls />
-            {/*<h5>Raw editable (use at your own risk)</h5>
-
-            <pre onBlur={handleRawInputChange} contentEditable="true">
-              {JSON.stringify(case_inputs, undefined, 2)}
-  </pre>*/}
+            <div className={classes.topRight}>
+              {isLoadingError ? <LoadingScreenError /> : <PlotContainer />}
+            </div>
           </div>
-          <div className={classes.right}>
-            {isLoadingError ? <LoadingScreenError /> : <PlotContainer />}
+          <div className={classes.bottom}>
+            <div className={classes.bottomMain}>
+              <CaseControls />
+            </div>
           </div>
         </div>
-        <div></div>
       </div>
     </ThemeProvider>
   );
