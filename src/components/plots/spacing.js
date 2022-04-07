@@ -9,7 +9,26 @@ export const getIdealSpacing = (arr, spacing) => {
   used to position potentially overlapping values (like svg icons) on plots.
 
 */
-  // console.log(arr);
+
+  // MANUALLY HANDLE SORTING ISSUES FOR ARRAY WITH DUPLICATES (MULTIPLY DUPLICATES BY SLIGHT AMOUNT)
+  let single_array = [];
+  let duplicate_array = [];
+  let no_duplicate_array = [...arr];
+  arr.forEach((e, i) => {
+    if (!single_array.includes(e)) {
+      single_array.push(e);
+    } else {
+      duplicate_array.push([i, e]);
+    }
+  });
+
+  duplicate_array.forEach((e, i) => {
+    no_duplicate_array[e[0]] = e[1] * 1.0000000001 + i / 10;
+  });
+
+  arr = no_duplicate_array;
+
+  // SORT ARRAY, GET MIN / MAX VALUES, ESTABLISH INCREMENT VALUE AND LOG ORIGINAL POSITIONS
 
   let arr_sorted = [...arr].sort((a, b) => a - b);
   let spaced_arr_sorted = [...arr_sorted];
@@ -26,6 +45,7 @@ export const getIdealSpacing = (arr, spacing) => {
     };
   });
 
+  // LOOP THROUGH EACH SORTED VALUE
   spaced_arr_sorted.forEach((e, i) => {
     let current_val = e;
 
@@ -41,6 +61,7 @@ export const getIdealSpacing = (arr, spacing) => {
     let overlap_prev = isOverlapping(prev_val, next_val, spacing);
     let is_overlap = overlap_next || overlap_prev;
 
+    // ITERATE TO REMOVE SPATIAL OVERLAP
     while (is_overlap) {
       let current_val_decrement_test = current_val - increment_value;
       let overlaps_previous_decrement_test = isOverlapping(
@@ -55,14 +76,13 @@ export const getIdealSpacing = (arr, spacing) => {
         next_val = next_val + increment_value;
       }
 
-      // problem is there IS an overlap but it keeps going down lower than the previous value.
       overlap_next = isOverlapping(current_val, next_val, spacing);
 
       overlap_prev = isOverlapping(prev_val, current_val, spacing);
       is_overlap = overlap_next || overlap_prev;
     }
 
-    // modify actual list
+    // MODIFY ACTUAL LIST
     spaced_arr_sorted[i] = current_val;
     if (i + 1 < spaced_arr_sorted.length) {
       spaced_arr_sorted[i + 1] = next_val;
@@ -76,6 +96,7 @@ export const getIdealSpacing = (arr, spacing) => {
     original_position_array.push(original_position);
   });
 
+  // REASSEMBLE NEWLY-SPACED ARRAY
   let spaced_arr_reordered = [];
   spaced_arr_sorted.forEach((e, i) => {
     let pos = original_position_array.filter((d) => d.pos == i)[0].new_val;

@@ -7,10 +7,10 @@ const initialState = {
       name: "Air Source HP Heating",
       state: "NY",
       climate_zone: "5A",
-      projection_case: "MidCase95by2050",
+      projection_case: "MidCase",
       design_areas: [
         {
-          type: "RetailStripmall",
+          type: "HighriseApartment",
           area: 200000,
           heating_fuel: "Electricity",
           dhw_fuel: "Electricity",
@@ -27,10 +27,10 @@ const initialState = {
       name: "Electric Resistance Heating",
       state: "NY",
       climate_zone: "5A",
-      projection_case: "MidCase95by2050",
+      projection_case: "MidCase",
       design_areas: [
         {
-          type: "RetailStripmall",
+          type: "HighriseApartment",
           area: 200000,
           heating_fuel: "Electricity",
           dhw_fuel: "Electricity",
@@ -47,10 +47,10 @@ const initialState = {
       name: "NG Heating",
       state: "NY",
       climate_zone: "5A",
-      projection_case: "MidCase95by2050",
+      projection_case: "MidCase",
       design_areas: [
         {
-          type: "RetailStripmall",
+          type: "HighriseApartment",
           area: 200000,
           heating_fuel: "Natural Gas",
           dhw_fuel: "Natural Gas",
@@ -106,6 +106,59 @@ export default function buildingReducer(state = initialState, action) {
       return {
         ...state,
         modified_inputs,
+      };
+    }
+
+    case "SET_CASE_HEATING_AND_DOMESTIC_COP": {
+      let { idx, cop } = action.payload;
+      let new_state = { ...state };
+      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
+      selected_case.design_areas[0].heating_cop = +cop;
+      selected_case.design_areas[0].dhw_cop = +cop;
+      return {
+        ...new_state,
+      };
+    }
+
+    case "SET_CASE_HEATING_AND_DOMESTIC_FUEL_SOURCE": {
+      let { idx, source } = action.payload;
+      let new_state = { ...state };
+      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
+      selected_case.design_areas[0].heating_fuel = source;
+      selected_case.design_areas[0].dhw_fuel = source;
+
+      return {
+        ...new_state,
+      };
+    }
+
+    case "SET_CASE_NAME": {
+      let { idx, name } = action.payload;
+      let new_state = { ...state };
+      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
+      selected_case.name = name;
+      return {
+        ...new_state,
+      };
+    }
+
+    case "SET_CASE_HEATING_TEMPLATE": {
+      let { idx, template } = action.payload;
+      let new_state = { ...state };
+      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
+      selected_case.starting_template = template;
+      return {
+        ...new_state,
+      };
+    }
+
+    case "SET_CASE_IS_DISPLAYED": {
+      let { idx, bool } = action.payload;
+      let new_state = { ...state };
+      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
+      selected_case.is_displayed = bool;
+      return {
+        ...new_state,
       };
     }
 

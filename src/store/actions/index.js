@@ -13,6 +13,41 @@ export function setCaseInputs(data) {
   };
 }
 
+export function setCaseHeatingAndDomesticCOP(payload) {
+  return {
+    type: "SET_CASE_HEATING_AND_DOMESTIC_COP",
+    payload: payload,
+  };
+}
+
+export function setCaseHeatingAndDomesticFuelSource(payload) {
+  return {
+    type: "SET_CASE_HEATING_AND_DOMESTIC_FUEL_SOURCE",
+    payload: payload,
+  };
+}
+
+export function setCaseName(payload) {
+  return {
+    type: "SET_CASE_NAME",
+    payload: payload,
+  };
+}
+
+export function setCaseHeatingTemplate(payload) {
+  return {
+    type: "SET_CASE_HEATING_TEMPLATE",
+    payload: payload,
+  };
+}
+
+export function setCaseIsDisplayed(payload) {
+  return {
+    type: "SET_CASE_IS_DISPLAYED",
+    payload: payload,
+  };
+}
+
 /* general ui actions */
 export function setWindowDimensions(dims) {
   return {
@@ -57,13 +92,9 @@ export function setThresholdView(val) {
   };
 }
 
-
 export function setGlobalCaseParameters(obj) {
   return {
-    type: 'SET_GLOBAL_CASE_PARAMETERS',
-    payload: obj
-  }
+    type: "SET_GLOBAL_CASE_PARAMETERS",
+    payload: obj,
+  };
 }
-
-
-
