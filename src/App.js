@@ -105,7 +105,7 @@ const useStyles = makeStyles({
 //   };
 
 //   useEffect(() => {
-//     updateResults();
+//     // updateResults();
 //   }, []);
 
 //   return (
@@ -142,16 +142,19 @@ const useStyles = makeStyles({
 //   );
 // };
 
+// // deploy testing
 const App = (props) => {
   return <div>hi</div>;
 };
 
-const mapStateToProps = (store) => {
-  return {
-    actions: { ...store.actions },
-    cases: { ...store.cases },
-    ui: { ...store.ui },
-  };
-};
+export default App;
 
-export default conn(mapStateToProps)(App);
+// const mapStateToProps = (store) => {
+//   return {
+//     actions: { ...store.actions },
+//     cases: { ...store.cases },
+//     ui: { ...store.ui },
+//   };
+// };
+
+// export default conn(mapStateToProps)(App);
