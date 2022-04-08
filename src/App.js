@@ -80,81 +80,80 @@ const useStyles = makeStyles({
   },
 });
 
-// const App = (props) => {
-//   const classes = useStyles();
-//   let { case_inputs, case_results, isLoadingError } = props.cases;
-//   let { isLoading } = props.ui;
-//   useEffect(() => {
-//     const handleResize = () => {
-//       props.actions.setWindowDimensions({
-//         width: window.innerWidth,
-//         height: window.innerHeight,
-//       });
-//     };
-
-//     window.addEventListener("resize", handleResize);
-//     return () => window.removeEventListener("resize", handleResize);
-//   }, [props.actions]);
-
-//   const updateResults = () => {
-//     api.getProjectionFromReferenceBuildings(
-//       props.cases.case_inputs,
-//       props.actions.setCaseResults,
-//       props.actions.setIsLoading
-//     );
-//   };
-
-//   useEffect(() => {
-//     // updateResults();
-//   }, []);
-
-//   return (
-//     <ThemeProvider theme={theme}>
-//       <div className={classes.root}>
-//         <div className={classes.main}>
-//           <LoadingSpinner isLoading={isLoading} />
-//           <div className={classes.top}>
-//             <div className={classes.topLeft}>
-//               <h5>Global Controls</h5>
-//               <GlobalControls />
-//               <div style={{ margin: 10, marginLeft: 20 }}>
-//                 <a
-//                   target="_blank"
-//                   rel="noopener"
-//                   href="https://akf-becp-pyapi.herokuapp.com/"
-//                 >
-//                   view api
-//                 </a>
-//               </div>
-//             </div>
-//             <div className={classes.topRight}>
-//               {isLoadingError ? <LoadingScreenError /> : <PlotContainer />}
-//             </div>
-//           </div>
-//           <div className={classes.bottom}>
-//             <div className={classes.bottomMain}>
-//               <CaseControls />
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </ThemeProvider>
-//   );
-// };
-
-// // deploy testing
 const App = (props) => {
-  return <div>hi</div>;
+  console.log(props);
+
+  const classes = useStyles();
+  let { case_inputs, isLoadingError, isLoading } = props;
+
+  const updateResults = () => {
+    api.getProjectionFromReferenceBuildings(
+      case_inputs,
+      props.actions.setCaseResults,
+      props.actions.setIsLoading
+    );
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      props.actions.setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    updateResults();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <div className={classes.root}>
+        <div className={classes.main}>
+          <LoadingSpinner isLoading={isLoading} />
+          <div className={classes.top}>
+            <div className={classes.topLeft}>
+              <h5>Global Controls</h5>
+              <GlobalControls />
+              <div style={{ margin: 10, marginLeft: 20 }}>
+                <a
+                  target="_blank"
+                  rel="noopener"
+                  href="https://akf-becp-pyapi.herokuapp.com/"
+                >
+                  view python api
+                </a>
+              </div>
+            </div>
+            <div className={classes.topRight}>
+              {isLoadingError ? <LoadingScreenError /> : <PlotContainer />}
+            </div>
+          </div>
+          <div className={classes.bottom}>
+            <div className={classes.bottomMain}>
+              <CaseControls />
+            </div>
+          </div>
+        </div>
+      </div>
+    </ThemeProvider>
+  );
 };
 
-export default App;
-
-// const mapStateToProps = (store) => {
-//   return {
-//     actions: { ...store.actions },
-//     cases: { ...store.cases },
-//     ui: { ...store.ui },
-//   };
+// deploy
+// const App = (props) => {
+//   return <div>hi</div>;
 // };
 
-// export default conn(mapStateToProps)(App);
+const mapStateToProps = (store) => {
+  return {
+    isLoadingError: store.cases.isLoadingError,
+    case_inputs: store.cases.case_inputs,
+    actions: { ...store.actions },
+    isLoading: store.ui.isLoading,
+  };
+};
+
+export default conn(mapStateToProps)(App);

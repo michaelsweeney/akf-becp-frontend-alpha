@@ -6,6 +6,11 @@ const FocusInput = (props) => {
   let stateValue = value;
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState(stateValue);
+
+  useEffect(() => {
+    setInputValue(stateValue);
+    callback(stateValue);
+  }, [stateValue]);
   return (
     <Input
       type={inputType}

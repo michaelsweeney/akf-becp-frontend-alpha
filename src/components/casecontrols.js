@@ -37,6 +37,27 @@ const useStyles = makeStyles({
   },
 });
 
+const templates = [
+  {
+    tag: "elec_ashp",
+    name: "Air Source HP",
+    heating_fuel: "Electricity",
+    heating_cop: 3,
+  },
+  {
+    tag: "elec_resistance",
+    name: "Electric Resistance",
+    heating_fuel: "Electricity",
+    heating_cop: 1,
+  },
+  {
+    tag: "ng_furnace",
+    name: "NG Heating",
+    heating_fuel: "Natural Gas",
+    heating_cop: 0.8,
+  },
+];
+
 const CaseControls = (props) => {
   const classes = useStyles();
   const { cases, plot_config } = props;
@@ -66,7 +87,21 @@ const CaseControls = (props) => {
   };
 
   const handleChangeHeatingTemplate = (idx, template) => {
+    let template_values = templates.find((d) => d.tag === template);
+
+    let { name, heating_fuel, heating_cop } = template_values;
+    console.log(idx, name, heating_fuel, heating_cop);
     props.actions.setCaseHeatingTemplate({ idx, template });
+    props.actions.setCaseName({ idx, name });
+    props.actions.setCaseHeatingAndDomesticFuelSource({
+      idx: idx,
+      source: heating_fuel,
+    });
+    props.actions.setCaseHeatingAndDomesticCOP({
+      idx: idx,
+      cop: heating_cop,
+    });
+
     updateResults();
   };
 
@@ -75,27 +110,6 @@ const CaseControls = (props) => {
     updateResults();
   };
 
-  const templates = [
-    {
-      tag: "elec_ashp",
-      name: "Air Source HP",
-      heating_fuel: "Electricity",
-      heating_cop: 3,
-    },
-    {
-      tag: "elec_resistance",
-      name: "Electric Resistance",
-      heating_fuel: "Electricity",
-      heating_cop: 1,
-    },
-    {
-      tag: "ng_furnace",
-      name: "NG Heating",
-      heating_fuel: "Natural Gas",
-      heating_cop: 0.8,
-    },
-  ];
-
   return (
     <div>
       <Table className={classes.table}>
@@ -103,11 +117,8 @@ const CaseControls = (props) => {
           <TableRow>
             <TableCell>Display Case</TableCell>
             <TableCell>Case Name</TableCell>
-            <TableCell>
-              <span style={{ color: "red" }}>Template (tbi)</span>
-            </TableCell>
+            <TableCell>Template</TableCell>
             <TableCell>Heating Fuel</TableCell>
-
             <TableCell>Heating COP</TableCell>
           </TableRow>
         </TableHead>
