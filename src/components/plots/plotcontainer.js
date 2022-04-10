@@ -18,13 +18,19 @@ const useStyles = makeStyles({
 });
 
 const PlotContainer = (props) => {
-  // console.log("PlotContainerRender", props);
   const classes = useStyles();
   const container = useRef(null);
 
-  let { case_results, plot_config } = props;
+  let { case_results, plot_config, window_dimensions } = props;
 
-  // console.log(case_results);
+  useEffect(() => {
+    if (case_results.length > 0) {
+      createChart({
+        ...plot_config,
+        disable_transitions: true,
+      });
+    }
+  }, [window_dimensions]);
 
   useEffect(() => {
     if (case_results.length > 0) {
@@ -33,9 +39,8 @@ const PlotContainer = (props) => {
   }, [case_results]);
 
   const createChart = (plot_config) => {
-    let { activePlot, thresholdView } = plot_config;
+    let { activePlot, thresholdView, disable_transitions } = plot_config;
     // handle / transform datasets
-
     let node = container.current;
 
     let margins = {
@@ -179,7 +184,7 @@ const PlotContainer = (props) => {
 
     let colorScale = d3.schemeTableau10;
 
-    let transition_duration = 500;
+    let transition_duration = disable_transitions ? 0 : 500;
 
     let multiline_legend_icon_svg = [
       HeatPumpIconPath,
@@ -241,6 +246,7 @@ const PlotContainer = (props) => {
       .attr("stroke", (d, i) => colorScale[i])
       .attr("stroke-width", 3);
 
+    console.log(berdo_thresholds);
     multiline_berdo_g
       .selectAll(".berdo-threshold-circle")
       .data(berdo_thresholds[0])
@@ -551,6 +557,7 @@ const mapStateToProps = (store) => {
   return {
     case_results: store.case_outputs.case_results,
     plot_config: store.plot_config,
+    window_dimensions: store.ui.dims,
   };
 };
 
