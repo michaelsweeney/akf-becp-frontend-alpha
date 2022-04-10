@@ -8,21 +8,32 @@ import { useRef, useEffect } from "react";
 import { conn } from "../../store/connect";
 
 import { getIdealSpacing } from "./spacing";
+import { makeStyles } from "@material-ui/styles";
+
+const useStyles = makeStyles({
+  container: {
+    height: "100%",
+    width: "100%",
+  },
+});
 
 const PlotContainer = (props) => {
+  // console.log("PlotContainerRender", props);
+  const classes = useStyles();
   const container = useRef(null);
 
-  let { case_results } = props.cases;
-  let { plot_config } = props;
+  let { case_results, plot_config } = props;
+
+  // console.log(case_results);
 
   useEffect(() => {
     if (case_results.length > 0) {
       createChart(plot_config);
     }
-  });
+  }, [case_results]);
 
   const createChart = (plot_config) => {
-    let { activePlot, stackedAreaIndex, thresholdView } = plot_config;
+    let { activePlot, thresholdView } = plot_config;
     // handle / transform datasets
 
     let node = container.current;
@@ -305,7 +316,7 @@ const PlotContainer = (props) => {
       .attr("x", 40)
       .attr("y", (d, i) => 30 * i + 5)
       .attr("class", "multiline-legend-case-text")
-      .text((d) => d.name);
+      .text((d) => d.case_name);
 
     let multiline_icon_annotation_values = emissions_projections.map(
       (d) => d.filter((e) => e.year == "2050")[0]["kg_co2_per_sf"]
@@ -370,21 +381,21 @@ const PlotContainer = (props) => {
       ...emissions_projections[0].map((d) => {
         return {
           ...d,
-          name: case_results[0].name,
+          case_name: case_results[0].case_name,
           nameidx: 0,
         };
       }),
       ...emissions_projections[1].map((d) => {
         return {
           ...d,
-          name: case_results[1].name,
+          case_name: case_results[1].case_name,
           nameidx: 1,
         };
       }),
       ...emissions_projections[2].map((d) => {
         return {
           ...d,
-          name: case_results[2].name,
+          case_name: case_results[2].case_name,
           nameidx: 2,
         };
       }),
@@ -498,7 +509,7 @@ const PlotContainer = (props) => {
       hover_info_year_text.text(selected_year);
       hover_info_text.text((d, i) => {
         let year = selected_year;
-        let simname = case_results[i].name;
+        let simname = case_results[i].case_name;
         let val = d3.format(".2f")(
           d.filter((a) => a.year === year)[0]["kg_co2_per_sf"]
         );
@@ -513,8 +524,6 @@ const PlotContainer = (props) => {
 
     // VIEW TOGGLE
     if (activePlot === "multiline") {
-      // stacked_area_g.remove();
-      // stacked_legend_g.remove();
     }
 
     if (activePlot === "stacked") {
@@ -533,22 +542,15 @@ const PlotContainer = (props) => {
     }
   };
 
-  return (
-    <div
-      style={{
-        height: "100%",
-        width: "100%",
-      }}
-      ref={container}
-    ></div>
-  );
+  return <div className={classes.container} ref={container}></div>;
 };
+
+// PlotContainer.whyDidYouRender = true;
 
 const mapStateToProps = (store) => {
   return {
-    actions: { ...store.actions },
-    cases: { ...store.cases },
-    plot_config: { ...store.plot_config },
+    case_results: store.case_outputs.case_results,
+    plot_config: store.plot_config,
   };
 };
 

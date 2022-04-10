@@ -36,47 +36,44 @@ const PlotControls = (props) => {
   };
   return (
     <div>
-
       <SingleSelect
-        id='plot-type-selector'
+        id="plot-type-selector"
         value={plot_config.activePlot}
         label="Plot Type"
         callback={handlePlotTypeSelectChange}
-        optionvalues={['multiline', 'stacked']}
-        optiontitles={['Multiline', 'Stacked by Fuel']}
+        optionvalues={["multiline", "stacked"]}
+        optiontitles={["Multiline", "Stacked by Fuel"]}
       />
 
-      {plot_config.activePlot == 'stacked' ? (
+      {plot_config.activePlot == "stacked" ? (
         <SingleSelect
           id="stacked-index-selector"
           label="Stacked Index Selector"
           value={plot_config.stackedAreaIndex}
           callback={handleStackedIndexSelector}
           optionvalues={cases.case_inputs.map((e, i) => i)}
-          optiontitles={cases.case_inputs.map((e, i) => e.name)}
-
-        />) :
+          optiontitles={cases.case_inputs.map((e, i) => e.case_name)}
+        />
+      ) : (
         <div></div>
-      }
+      )}
 
       <SingleSelect
         id="threshold-type-selector"
         label="Threshold Overlay"
         callback={handleThresholdTypeSelector}
         value={plot_config.thresholdView}
-        optionvalues={['none', 'berdo', 'll97']}
-        optiontitles={['None', 'BERDO', 'LL97']}
+        optionvalues={["none", "berdo", "ll97"]}
+        optiontitles={["None", "BERDO", "LL97"]}
       />
-
     </div>
   );
 };
 
 const mapStateToProps = (store) => {
   return {
-    actions: { ...store.actions },
-    cases: { ...store.cases },
-    plot_config: { ...store.plot_config },
+    cases: store.cases,
+    plot_config: store.plot_config,
   };
 };
 

@@ -155,9 +155,7 @@ async function getProjectionFromReferenceBuildings(
   isLoadingCallback
 ) {
   isLoadingCallback(true);
-
   let projection_results = [];
-
   async function getQueryResults(params, subdirectory) {
     let endpoint = `${url}/${subdirectory}?params=${JSON.stringify(params)}`;
     let response = await fetch(endpoint, {});
@@ -236,7 +234,7 @@ async function getProjectionFromReferenceBuildings(
 
     /* COMPILE AND PUSH RESULTS */
     projection_results.push({
-      name: alt.name,
+      case_name: alt.case_name,
       case_results,
       ll97_results,
       berdo_results,
@@ -249,6 +247,7 @@ async function getProjectionFromReferenceBuildings(
       payment_sum += e["val"];
     });
   });
+
   resultsCallback(projection_results);
 
   isLoadingCallback(false);

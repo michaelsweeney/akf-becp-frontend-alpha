@@ -1,10 +1,13 @@
+import produce from "immer";
+import { current } from "immer";
+
 const initialState = {
   case_inputs: [
     {
       id: 0,
       is_displayed: true,
       starting_template: "elec_ashp",
-      name: "Air Source HP Heating",
+      case_name: "Air Source HP Heating",
       state: "NY",
       climate_zone: "5A",
       projection_case: "MidCase",
@@ -24,7 +27,7 @@ const initialState = {
       id: 1,
       is_displayed: true,
       starting_template: "elec_resistance",
-      name: "Electric Resistance Heating",
+      case_name: "Electric Resistance Heating",
       state: "NY",
       climate_zone: "5A",
       projection_case: "MidCase",
@@ -44,7 +47,7 @@ const initialState = {
       id: 2,
       is_displayed: true,
       starting_template: "ng_furnace",
-      name: "NG Heating",
+      case_name: "NG Heating",
       state: "NY",
       climate_zone: "5A",
       projection_case: "MidCase",
@@ -61,8 +64,6 @@ const initialState = {
       ],
     },
   ],
-  case_results: [],
-  isLoadingError: false,
 };
 
 export default function buildingReducer(state = initialState, action) {
@@ -73,70 +74,59 @@ export default function buildingReducer(state = initialState, action) {
         case_inputs: action.payload,
       };
     }
-    case "SET_CASE_RESULTS": {
-      if (action.payload === false) {
-        return {
-          ...state,
-          isLoadingError: true,
-        };
-      } else {
-        return {
-          ...state,
-          case_results: action.payload,
-          isLoadingError: false,
-        };
-      }
-    }
 
     case "SET_GLOBAL_CASE_PARAMETERS": {
       let key = action.payload[0];
       let val = action.payload[1];
 
-      let modified_inputs = [...state.case_inputs];
-      state.case_inputs.forEach((c, i) => {
-        if (key == "building_type") {
-          modified_inputs[i]["design_areas"][0]["type"] = val;
-        } else if (key == "ashrae_standard") {
-          modified_inputs[i]["design_areas"][0]["ashrae_standard"] = val;
-        } else {
-          modified_inputs[i][key] = val;
-        }
+      let new_state = produce(state, (draft) => {
+        let modified_inputs = draft.case_inputs;
+        state.case_inputs.forEach((c, i) => {
+          if (key == "building_type") {
+            modified_inputs[i]["design_areas"][0]["type"] = val;
+          } else if (key == "ashrae_standard") {
+            modified_inputs[i]["design_areas"][0]["ashrae_standard"] = val;
+          } else {
+            modified_inputs[i][key] = val;
+          }
+        });
       });
 
       return {
-        ...state,
-        modified_inputs,
+        ...new_state,
       };
     }
 
     case "SET_CASE_HEATING_AND_DOMESTIC_COP": {
       let { idx, cop } = action.payload;
-      let new_state = { ...state };
-      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
-      selected_case.design_areas[0].heating_cop = +cop;
-      selected_case.design_areas[0].dhw_cop = +cop;
-      return {
-        ...new_state,
-      };
+
+      let new_state = produce(state, (draft) => {
+        let selected_case = draft.case_inputs.find((d) => d.id === idx);
+        selected_case.design_areas[0].heating_cop = +cop;
+        selected_case.design_areas[0].dhw_cop = +cop;
+      });
+
+      return new_state;
     }
 
     case "SET_CASE_HEATING_AND_DOMESTIC_FUEL_SOURCE": {
       let { idx, source } = action.payload;
-      let new_state = { ...state };
-      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
-      selected_case.design_areas[0].heating_fuel = source;
-      selected_case.design_areas[0].dhw_fuel = source;
 
-      return {
-        ...new_state,
-      };
+      let new_state = produce(state, (draft) => {
+        let selected_case = draft.case_inputs.find((d) => d.id === idx);
+        selected_case.design_areas[0].heating_fuel = source;
+        selected_case.design_areas[0].dhw_fuel = source;
+      });
+
+      return new_state;
     }
 
     case "SET_CASE_NAME": {
-      let { idx, name } = action.payload;
-      let new_state = { ...state };
-      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
-      selected_case.name = name;
+      let { idx, case_name } = action.payload;
+      let new_state = produce(state, (draft) => {
+        let selection = draft.case_inputs.find((d) => d.id === idx);
+        selection.case_name = case_name;
+      });
       return {
         ...new_state,
       };
@@ -144,9 +134,12 @@ export default function buildingReducer(state = initialState, action) {
 
     case "SET_CASE_HEATING_TEMPLATE": {
       let { idx, template } = action.payload;
-      let new_state = { ...state };
-      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
-      selected_case.starting_template = template;
+
+      let new_state = produce(state, (draft) => {
+        let selection = draft.case_inputs.find((d) => d.id === idx);
+        selection.starting_template = template;
+      });
+
       return {
         ...new_state,
       };
@@ -154,9 +147,12 @@ export default function buildingReducer(state = initialState, action) {
 
     case "SET_CASE_IS_DISPLAYED": {
       let { idx, bool } = action.payload;
-      let new_state = { ...state };
-      let selected_case = new_state.case_inputs.find((d) => d.id === idx);
-      selected_case.is_displayed = bool;
+
+      let new_state = produce(state, (draft) => {
+        let selected_case = draft.case_inputs.find((d) => d.id === idx);
+        selected_case.is_displayed = bool;
+      });
+
       return {
         ...new_state,
       };

@@ -15,7 +15,6 @@ export const createStackedAreaChart = (config) => {
     margins,
     plot_config,
     emissions_projections_by_fuel,
-    stackedAreaIndex,
     xScale,
     yScale,
   } = config;

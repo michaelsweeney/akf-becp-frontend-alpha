@@ -12,6 +12,7 @@ import { makeStyles } from "@material-ui/styles";
 import { useEffect, useState } from "react";
 import * as api from "../apicalls";
 import { SingleSelect } from "./singleselect";
+import { StorefrontRounded } from "@mui/icons-material";
 
 const useStyles = makeStyles({
   root: {},
@@ -23,7 +24,7 @@ const useStyles = makeStyles({
 });
 
 const GlobalControls = (props) => {
-  let { case_inputs } = props.cases;
+  let { case_inputs } = props;
 
   const plot_config = props.plot_config;
 
@@ -45,35 +46,39 @@ const GlobalControls = (props) => {
 
   const updateResults = () => {
     api.getProjectionFromReferenceBuildings(
-      props.cases.case_inputs,
+      case_inputs,
       props.actions.setCaseResults,
       props.actions.setIsLoading
     );
   };
 
+  useEffect(() => {
+    updateResults();
+  }, [case_inputs]);
+
   const handleStateCallback = (e) => {
     props.actions.setGlobalCaseParameters(["state", e.target.value]);
-    updateResults();
+    // updateResults();
   };
 
   const handleBuildingTypeCallback = (e) => {
     props.actions.setGlobalCaseParameters(["building_type", e.target.value]);
-    updateResults();
+    // updateResults();
   };
 
   const handleClimateZoneCallback = (e) => {
     props.actions.setGlobalCaseParameters(["climate_zone", e.target.value]);
-    updateResults();
+    // updateResults();
   };
 
   const handleCambiumCaseCallback = (e) => {
     props.actions.setGlobalCaseParameters(["projection_case", e.target.value]);
-    updateResults();
+    // updateResults();
   };
 
   const handleASHRAEStandardCallback = (e) => {
     props.actions.setGlobalCaseParameters(["ashrae_standard", e.target.value]);
-    updateResults();
+    // updateResults();
   };
   const handleThresholdTypeSelector = (p) => {
     props.actions.setThresholdView(p.target.value);
@@ -131,9 +136,8 @@ const GlobalControls = (props) => {
 
 const mapStateToProps = (store) => {
   return {
-    actions: { ...store.actions },
-    cases: { ...store.cases },
-    plot_config: { ...store.plot_config },
+    case_inputs: store.case_inputs.case_inputs,
+    plot_config: store.plot_config,
   };
 };
 

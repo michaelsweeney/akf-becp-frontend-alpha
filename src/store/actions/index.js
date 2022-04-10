@@ -78,13 +78,6 @@ export function setActivePlot(val) {
   };
 }
 
-export function setStackedAreaIndex(val) {
-  return {
-    type: "SET_STACKED_AREA_INDEX",
-    payload: val,
-  };
-}
-
 export function setThresholdView(val) {
   return {
     type: "SET_THRESHOLD_VIEW",

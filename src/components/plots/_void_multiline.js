@@ -164,7 +164,7 @@ export const createMultiLineChart = (config) => {
     .attr("x", 40)
     .attr("y", (d, i) => 30 * i + 5)
     .attr("class", "multiline-legend-case-text")
-    .text((d) => d.name);
+    .text((d) => d.case_name);
 
   let multiline_icon_annotation_values = emissions_projections.map(
     (d) => d.filter((e) => e.year == "2050")[0]["kg_co2_per_sf"]
@@ -229,21 +229,21 @@ export const createMultiLineChart = (config) => {
     ...emissions_projections[0].map((d) => {
       return {
         ...d,
-        name: case_results[0].name,
+        case_name: case_results[0].case_name,
         nameidx: 0,
       };
     }),
     ...emissions_projections[1].map((d) => {
       return {
         ...d,
-        name: case_results[1].name,
+        case_name: case_results[1].case_name,
         nameidx: 1,
       };
     }),
     ...emissions_projections[2].map((d) => {
       return {
         ...d,
-        name: case_results[2].name,
+        case_name: case_results[2].case_name,
         nameidx: 2,
       };
     }),
@@ -357,7 +357,7 @@ export const createMultiLineChart = (config) => {
     hover_info_year_text.text(selected_year);
     hover_info_text.text((d, i) => {
       let year = selected_year;
-      let simname = case_results[i].name;
+      let simname = case_results[i].case_name;
       let val = d3.format(".2f")(
         d.filter((a) => a.year === year)[0]["kg_co2_per_sf"]
       );

@@ -81,10 +81,10 @@ const useStyles = makeStyles({
 });
 
 const App = (props) => {
-  console.log(props);
+  // console.log("AppRender", props);
 
   const classes = useStyles();
-  let { case_inputs, isLoadingError, isLoading } = props;
+  let { isLoadingError, case_inputs, isLoading } = props;
 
   const updateResults = () => {
     api.getProjectionFromReferenceBuildings(
@@ -95,15 +95,16 @@ const App = (props) => {
   };
 
   useEffect(() => {
+    updateResults();
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
       props.actions.setWindowDimensions({
         width: window.innerWidth,
         height: window.innerHeight,
       });
     };
-
-    updateResults();
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -117,7 +118,7 @@ const App = (props) => {
             <div className={classes.topLeft}>
               <h5>Global Controls</h5>
               <GlobalControls />
-              <div style={{ margin: 10, marginLeft: 20 }}>
+              <div>
                 <a
                   target="_blank"
                   rel="noopener"
@@ -142,16 +143,12 @@ const App = (props) => {
   );
 };
 
-// deploy
-// const App = (props) => {
-//   return <div>hi</div>;
-// };
+App.whyDidYouRender = true;
 
 const mapStateToProps = (store) => {
   return {
-    isLoadingError: store.cases.isLoadingError,
-    case_inputs: store.cases.case_inputs,
-    actions: { ...store.actions },
+    isLoadingError: store.case_outputs.isLoadingError,
+    case_inputs: store.case_inputs.case_inputs,
     isLoading: store.ui.isLoading,
   };
 };

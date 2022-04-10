@@ -5,7 +5,6 @@ const initialState = {
     - multiline
   */
   activePlot: "multiline",
-  stackedAreaIndex: 0,
   thresholdView: "none",
 };
 
@@ -23,12 +22,7 @@ export default function plotReducer(state = initialState, action) {
         activePlot: action.payload,
       };
     }
-    case "SET_STACKED_AREA_INDEX": {
-      return {
-        ...state,
-        stackedAreaIndex: action.payload,
-      };
-    }
+
     case "SET_THRESHOLD_VIEW": {
       return {
         ...state,

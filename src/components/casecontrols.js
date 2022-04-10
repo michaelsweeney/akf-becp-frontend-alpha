@@ -1,17 +1,14 @@
 import { conn } from "../store/connect";
 
 import {
-  Button,
   MenuItem,
   Select,
-  InputLabel,
   FormControl,
   Table,
   TableBody,
   TableRow,
   TableCell,
   TableHead,
-  Input,
   Checkbox,
 } from "@mui/material";
 
@@ -20,7 +17,6 @@ import { useEffect, useState } from "react";
 import * as api from "../apicalls";
 import { SingleSelect } from "./singleselect";
 import { FocusInput } from "./focusinput";
-import { SettingsBluetoothRounded } from "@mui/icons-material";
 
 const useStyles = makeStyles({
   root: {},
@@ -40,59 +36,66 @@ const useStyles = makeStyles({
 const templates = [
   {
     tag: "elec_ashp",
-    name: "Air Source HP",
+    case_name: "Air Source HP",
     heating_fuel: "Electricity",
     heating_cop: 3,
   },
   {
     tag: "elec_resistance",
-    name: "Electric Resistance",
+    case_name: "Electric Resistance",
     heating_fuel: "Electricity",
     heating_cop: 1,
   },
   {
     tag: "ng_furnace",
-    name: "NG Heating",
+    case_name: "NG Heating",
     heating_fuel: "Natural Gas",
     heating_cop: 0.8,
   },
 ];
 
 const CaseControls = (props) => {
+  // console.log("CaseControlsRender", props);
+
   const classes = useStyles();
-  const { cases, plot_config } = props;
+  const { case_inputs } = props;
+
   const updateResults = () => {
     api.getProjectionFromReferenceBuildings(
-      props.cases.case_inputs,
+      case_inputs,
       props.actions.setCaseResults,
       props.actions.setIsLoading
     );
   };
+
+  useEffect(() => {
+    updateResults();
+  }, [case_inputs]);
+
   const handleChangeHeatingAndDomesticCOP = (idx, cop) => {
     props.actions.setCaseHeatingAndDomesticCOP({
       idx,
       cop,
     });
-    updateResults();
+    // updateResults();
   };
 
   const handleChangeHeatingAndDomesticFuelSource = (idx, source) => {
     props.actions.setCaseHeatingAndDomesticFuelSource({ idx, source });
-    updateResults();
+    // updateResults();
   };
 
-  const handleChangeName = (idx, name) => {
-    props.actions.setCaseName({ idx, name });
-    updateResults();
+  const handleChangeName = (idx, case_name) => {
+    props.actions.setCaseName({ idx: idx, case_name: case_name });
+    // updateResults();
   };
 
   const handleChangeHeatingTemplate = (idx, template) => {
     let template_values = templates.find((d) => d.tag === template);
 
-    let { name, heating_fuel, heating_cop } = template_values;
-    console.log(idx, name, heating_fuel, heating_cop);
+    let { case_name, heating_fuel, heating_cop } = template_values;
     props.actions.setCaseHeatingTemplate({ idx, template });
-    props.actions.setCaseName({ idx, name });
+    props.actions.setCaseName({ idx, case_name });
     props.actions.setCaseHeatingAndDomesticFuelSource({
       idx: idx,
       source: heating_fuel,
@@ -102,12 +105,12 @@ const CaseControls = (props) => {
       cop: heating_cop,
     });
 
-    updateResults();
+    // updateResults();
   };
 
   const handleChangeIsDisplayed = (idx, bool) => {
     props.actions.setCaseIsDisplayed({ idx, bool });
-    updateResults();
+    // updateResults();
   };
 
   return (
@@ -123,7 +126,7 @@ const CaseControls = (props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {cases.case_inputs.map((c, i) => {
+          {case_inputs.map((c, i) => {
             return (
               <TableRow key={`tablerow-${i}`}>
                 <TableCell sx={{ textAlign: "center" }}>
@@ -140,7 +143,7 @@ const CaseControls = (props) => {
                   <FormControl size="small" fullWidth>
                     <FocusInput
                       callback={(e) => handleChangeName(i, e)}
-                      value={c.name}
+                      value={c.case_name}
                       inputType="text"
                     />
                   </FormControl>
@@ -158,7 +161,7 @@ const CaseControls = (props) => {
                       {templates.map((e, i) => {
                         return (
                           <MenuItem key={`template-${i}`} value={e.tag}>
-                            {e.name}
+                            {e.case_name}
                           </MenuItem>
                         );
                       })}
@@ -202,9 +205,7 @@ const CaseControls = (props) => {
 
 const mapStateToProps = (store) => {
   return {
-    actions: { ...store.actions },
-    cases: { ...store.cases },
-    plot_config: { ...store.plot_config },
+    case_inputs: store.case_inputs.case_inputs,
   };
 };
 
