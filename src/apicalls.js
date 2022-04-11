@@ -242,13 +242,12 @@ async function getProjectionFromReferenceBuildings(
 
     let fuel_type = alt.design_areas[0].heating_fuel;
     let case_cop = alt.design_areas[0].heating_cop;
-
     /* COMPILE AND PUSH RESULTS */
     projection_results.push({
       case_name: alt.case_name,
       case_id: alt.id,
+      is_displayed: alt.is_displayed,
       case_fuel_type: fuel_type,
-
       case_cop: case_cop,
       case_results,
       ll97_results,

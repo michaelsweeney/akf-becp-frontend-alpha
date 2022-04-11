@@ -117,13 +117,13 @@ const App = (props) => {
               <h5>Global Controls</h5>
               <GlobalControls />
               <div>
-                <a
+                {/* <a
                   target="_blank"
                   rel="noopener"
                   href="https://akf-becp-pyapi.herokuapp.com/"
                 >
                   view python api
-                </a>
+                </a> */}
               </div>
             </div>
             <div className={classes.topRight}>

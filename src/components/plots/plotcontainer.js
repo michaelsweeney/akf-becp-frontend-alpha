@@ -21,10 +21,14 @@ const PlotContainer = (props) => {
   const classes = useStyles();
   const container = useRef(null);
 
-  let { case_results, plot_config, window_dimensions } = props;
+  let { case_results: case_results, plot_config, window_dimensions } = props;
+
+  let case_results_displayed = case_results.filter(
+    (f) => f.is_displayed === true
+  );
 
   useEffect(() => {
-    if (case_results.length > 0) {
+    if (case_results_displayed.length > 0) {
       createChart({
         ...plot_config,
         disable_transitions: true,
@@ -33,20 +37,20 @@ const PlotContainer = (props) => {
   }, [window_dimensions]);
 
   useEffect(() => {
-    if (case_results.length > 0) {
+    if (case_results_displayed.length > 0) {
       createChart(plot_config);
     }
-  }, [case_results]);
+  }, [case_results_displayed]);
 
   const createChart = (plot_config) => {
-    let { activePlot, thresholdView, disable_transitions } = plot_config;
+    let { thresholdView, disable_transitions } = plot_config;
     // handle / transform datasets
     let node = container.current;
 
     let margins = {
       t: 50,
       b: 150,
-      r: 100,
+      r: 200,
       l: 50,
     };
     let containerdims = {
@@ -59,18 +63,18 @@ const PlotContainer = (props) => {
       containerdims["height"] = height;
     }
 
-    let emissions_projections = case_results.map(
+    let emissions_projections = case_results_displayed.map(
       (d) => d["case_results"]["emissions_projection"]
     );
 
-    let emissions_projections_by_fuel = case_results.map(
+    let emissions_projections_by_fuel = case_results_displayed.map(
       (d) => d["case_results"]["emissions_projection_by_fuel"]
     );
 
-    let berdo_thresholds = case_results.map(
+    let berdo_thresholds = case_results_displayed.map(
       (d) => d["berdo_results"]["emissions_thresholds_per_sf"]
     );
-    let ll97_thresholds = case_results.map(
+    let ll97_thresholds = case_results_displayed.map(
       (d) => d["ll97_results"]["emissions_thresholds_per_sf"]
     );
 
@@ -86,7 +90,7 @@ const PlotContainer = (props) => {
       }
     };
 
-    let icon_array = case_results.map((d, i) => {
+    let icon_array = case_results_displayed.map((d, i) => {
       let { case_fuel_type, case_cop } = d;
 
       let case_icon = getCaseIcon(case_fuel_type, case_cop);
@@ -333,7 +337,7 @@ const PlotContainer = (props) => {
 
     let multiline_legend_case_text = multiline_legend_g
       .selectAll(".multiline-legend-case-text")
-      .data(case_results)
+      .data(case_results_displayed)
       .join("text")
       .attr("x", 40)
       .attr("y", (d, i) => 30 * i + 5)
@@ -366,6 +370,24 @@ const PlotContainer = (props) => {
           margins.t + d - 12
         }) scale(1.25 1.25)`;
       });
+
+    let multiline_berdo_annotations = multiline_berdo_g
+      .selectAll(".multiline-berdo-annotations")
+      .data(berdo_thresholds[0])
+      .join("text")
+      .attr("class", "multiline-berdo-annotations")
+      .attr("x", chartdims.width + 10)
+      .attr("y", (d) => yScale(d.val))
+      .text((d) => `${d.period}: ${d.val} kg/sf/yr`);
+
+    let multiline_ll97_annotations = multiline_ll97_g
+      .selectAll(".multiline-ll97-annotations")
+      .data(ll97_thresholds[0])
+      .join("text")
+      .attr("class", "multiline-ll97-annotations")
+      .attr("x", chartdims.width + 10)
+      .attr("y", (d) => yScale(d.val))
+      .text((d) => `${d.period}: ${d.val} kg/sf/yr`);
 
     title_g
       .selectAll(".chart-title-text")
@@ -402,7 +424,7 @@ const PlotContainer = (props) => {
       e.forEach((o, oi) => {
         emissions_projections_flat.push({
           ...o,
-          case_name: case_results[ei].case_name,
+          case_name: case_results_displayed[ei].case_name,
           nameidx: ei,
         });
       });
@@ -516,7 +538,7 @@ const PlotContainer = (props) => {
       hover_info_year_text.text(selected_year);
       hover_info_text.text((d, i) => {
         let year = selected_year;
-        let simname = case_results[i].case_name;
+        let simname = case_results_displayed[i].case_name;
         let val = d3.format(".2f")(
           d.filter((a) => a.year === year)[0]["kg_co2_per_sf"]
         );
@@ -530,18 +552,14 @@ const PlotContainer = (props) => {
     });
 
     // VIEW TOGGLE
-    if (activePlot === "multiline") {
-    }
 
-    if (activePlot === "stacked") {
-      multiline_g.remove();
-      multiline_legend_g.remove();
-    }
     if (thresholdView === "berdo") {
       multiline_ll97_g.remove();
+      multiline_icon_annotations.remove();
     }
     if (thresholdView === "ll97") {
       multiline_berdo_g.remove();
+      multiline_icon_annotations.remove();
     }
     if (thresholdView === "none") {
       multiline_berdo_g.remove();

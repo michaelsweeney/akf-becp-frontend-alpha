@@ -71,13 +71,6 @@ export function setPlotConfig(config) {
   };
 }
 
-export function setActivePlot(val) {
-  return {
-    type: "SET_ACTIVE_PLOT",
-    payload: val,
-  };
-}
-
 export function setThresholdView(val) {
   return {
     type: "SET_THRESHOLD_VIEW",

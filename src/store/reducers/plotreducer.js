@@ -4,7 +4,7 @@ const initialState = {
     - stacked
     - multiline
   */
-  activePlot: "multiline",
+
   thresholdView: "none",
 };
 
@@ -13,13 +13,6 @@ export default function plotReducer(state = initialState, action) {
     case "SET_PLOT_CONFIG": {
       return {
         ...action.payload,
-      };
-    }
-
-    case "SET_ACTIVE_PLOT": {
-      return {
-        ...state,
-        activePlot: action.payload,
       };
     }
 
