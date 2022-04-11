@@ -81,8 +81,6 @@ const useStyles = makeStyles({
 });
 
 const App = (props) => {
-  console.log("AppRender", props);
-
   const classes = useStyles();
   let { isLoadingError, case_inputs, isLoading } = props;
 
@@ -143,7 +141,7 @@ const App = (props) => {
   );
 };
 
-App.whyDidYouRender = true;
+// App.whyDidYouRender = true;
 
 const mapStateToProps = (store) => {
   return {

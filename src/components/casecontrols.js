@@ -38,7 +38,7 @@ const templates = [
     tag: "elec_ashp",
     case_name: "Air Source HP",
     heating_fuel: "Electricity",
-    heating_cop: 3,
+    heating_cop: 2.5,
   },
   {
     tag: "elec_resistance",
@@ -51,6 +51,12 @@ const templates = [
     case_name: "NG Heating",
     heating_fuel: "Natural Gas",
     heating_cop: 0.8,
+  },
+  {
+    tag: "vrf",
+    case_name: "VRF",
+    heating_fuel: "Electricity",
+    heating_cop: 3.4,
   },
 ];
 

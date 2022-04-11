@@ -74,6 +74,28 @@ const PlotContainer = (props) => {
       (d) => d["ll97_results"]["emissions_thresholds_per_sf"]
     );
 
+    let getCaseIcon = (fuel_type, cop) => {
+      if (fuel_type == "Natural Gas") {
+        return GasIconPath;
+      } else if (fuel_type == "Electricity") {
+        if (cop == 1) {
+          return ElectricityIconPath;
+        } else {
+          return HeatPumpIconPath;
+        }
+      }
+    };
+
+    let icon_array = case_results.map((d, i) => {
+      let { case_fuel_type, case_cop } = d;
+
+      let case_icon = getCaseIcon(case_fuel_type, case_cop);
+      return {
+        case_color: d3.schemeCategory10[i],
+        case_icon_d: case_icon,
+      };
+    });
+
     let y_padding = 1.1;
 
     let max_threshold_val = d3.max([
@@ -186,11 +208,6 @@ const PlotContainer = (props) => {
 
     let transition_duration = disable_transitions ? 0 : 500;
 
-    let multiline_legend_icon_svg = [
-      HeatPumpIconPath,
-      ElectricityIconPath,
-      GasIconPath,
-    ];
     let legend_padding_top = 50;
 
     let berdo_color = "black";
@@ -243,10 +260,9 @@ const PlotContainer = (props) => {
       .duration(transition_duration)
       .attr("d", lineGen)
       .attr("fill", "none")
-      .attr("stroke", (d, i) => colorScale[i])
+      .attr("stroke", (d, i) => icon_array[i].case_color)
       .attr("stroke-width", 3);
 
-    console.log(berdo_thresholds);
     multiline_berdo_g
       .selectAll(".berdo-threshold-circle")
       .data(berdo_thresholds[0])
@@ -305,15 +321,15 @@ const PlotContainer = (props) => {
 
     let multiline_legend_icons = multiline_legend_g
       .selectAll(".multiline-legend-icon-g")
-      .data(multiline_legend_icon_svg)
+      .data(icon_array)
       .join("path")
       .attr("class", "multiline-legend-icon-g")
       .attr(
         "transform",
         (d, i) => `translate(0, ${i * 30 - 15}) scale(1.25 1.25)`
       )
-      .attr("d", (d) => d)
-      .attr("fill", (d, i) => colorScale[i]);
+      .attr("d", (d) => d.case_icon_d)
+      .attr("fill", (d, i) => d.case_color);
 
     let multiline_legend_case_text = multiline_legend_g
       .selectAll(".multiline-legend-case-text")
@@ -341,13 +357,13 @@ const PlotContainer = (props) => {
       .data(spaced_multiline_icon_annotation_positions)
       .join("path")
       .attr("class", "multiline-icon-annotation")
-      .attr("d", (d, i) => multiline_legend_icon_svg[i])
-      .attr("fill", (d, i) => colorScale[i])
+      .attr("d", (d, i) => icon_array[i].case_icon_d)
+      .attr("fill", (d, i) => icon_array[i].case_color)
       .transition()
       .duration(transition_duration)
       .attr("transform", (d, i) => {
         return `translate(${chartdims.width + margins.l + 15}, ${
-          margins.t + d - 10
+          margins.t + d - 12
         }) scale(1.25 1.25)`;
       });
 
@@ -380,32 +396,17 @@ const PlotContainer = (props) => {
       .style("font-weight", 600);
 
     /* -- HOVER EVENTS -- */
-
-    // hacky flatten for hover circles
-
-    let emissions_projections_flat = [
-      ...emissions_projections[0].map((d) => {
-        return {
-          ...d,
-          case_name: case_results[0].case_name,
-          nameidx: 0,
-        };
-      }),
-      ...emissions_projections[1].map((d) => {
-        return {
-          ...d,
-          case_name: case_results[1].case_name,
-          nameidx: 1,
-        };
-      }),
-      ...emissions_projections[2].map((d) => {
-        return {
-          ...d,
-          case_name: case_results[2].case_name,
-          nameidx: 2,
-        };
-      }),
-    ];
+    // flatten for hover circles
+    let emissions_projections_flat = [];
+    emissions_projections.forEach((e, ei) => {
+      e.forEach((o, oi) => {
+        emissions_projections_flat.push({
+          ...o,
+          case_name: case_results[ei].case_name,
+          nameidx: ei,
+        });
+      });
+    });
 
     let hover_line = hover_g
       .selectAll(".hover-line")
@@ -430,7 +431,7 @@ const PlotContainer = (props) => {
       .attr("r", 4)
       .attr("cx", (d) => xScale(d.year))
       .attr("cy", (d) => yScale(d.kg_co2_per_sf))
-      .attr("fill", (d, i) => colorScale[d.nameidx])
+      .attr("fill", (d, i) => icon_array[d.nameidx].case_color)
       .attr("opacity", 0);
 
     let rect_width = 325;

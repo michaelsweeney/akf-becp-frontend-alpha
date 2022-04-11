@@ -1,6 +1,14 @@
 import { TryRounded } from "@mui/icons-material";
 import { store } from "./store";
 
+import {
+  HeatPumpIconPath,
+  ElectricityIconPath,
+  GasIconPath,
+} from "./components/plots/svgicons";
+
+import * as d3 from "d3";
+
 const url = "https://akf-becp-pyapi.herokuapp.com/";
 // const url = "http://localhost:5000";
 
@@ -232,9 +240,16 @@ async function getProjectionFromReferenceBuildings(
       "/compliance/compile_ll97_summary"
     );
 
+    let fuel_type = alt.design_areas[0].heating_fuel;
+    let case_cop = alt.design_areas[0].heating_cop;
+
     /* COMPILE AND PUSH RESULTS */
     projection_results.push({
       case_name: alt.case_name,
+      case_id: alt.id,
+      case_fuel_type: fuel_type,
+
+      case_cop: case_cop,
       case_results,
       ll97_results,
       berdo_results,
