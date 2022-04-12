@@ -6,50 +6,11 @@ const initialState = {
     {
       id: 0,
       is_displayed: true,
-      starting_template: "elec_ashp",
-      case_name: "Air Source HP Heating",
-      state: "NY",
-      climate_zone: "5A",
-      projection_case: "MidCase",
-      design_areas: [
-        {
-          type: "HighriseApartment",
-          area: 200000,
-          heating_fuel: "Electricity",
-          dhw_fuel: "Electricity",
-          heating_cop: 2.5,
-          dhw_cop: 2.5,
-          ashrae_standard: "90.1-2010",
-        },
-      ],
-    },
-    {
-      id: 1,
-      is_displayed: true,
-      starting_template: "elec_resistance",
-      case_name: "Electric Resistance Heating",
-      state: "NY",
-      climate_zone: "5A",
-      projection_case: "MidCase",
-      design_areas: [
-        {
-          type: "HighriseApartment",
-          area: 200000,
-          heating_fuel: "Electricity",
-          dhw_fuel: "Electricity",
-          heating_cop: 1,
-          dhw_cop: 1,
-          ashrae_standard: "90.1-2010",
-        },
-      ],
-    },
-    {
-      id: 2,
-      is_displayed: true,
+      is_base_case: true,
       starting_template: "ng_furnace",
       case_name: "NG Heating",
       state: "NY",
-      climate_zone: "5A",
+      climate_zone: "4A",
       projection_case: "MidCase",
       design_areas: [
         {
@@ -59,7 +20,49 @@ const initialState = {
           dhw_fuel: "Natural Gas",
           heating_cop: 0.8,
           dhw_cop: 0.8,
-          ashrae_standard: "90.1-2010",
+          ashrae_standard: "90.1-2016",
+        },
+      ],
+    },
+    {
+      id: 1,
+      is_displayed: true,
+      is_base_case: false,
+      starting_template: "elec_resistance",
+      case_name: "Electric Resistance Heating",
+      state: "NY",
+      climate_zone: "4A",
+      projection_case: "MidCase",
+      design_areas: [
+        {
+          type: "HighriseApartment",
+          area: 200000,
+          heating_fuel: "Electricity",
+          dhw_fuel: "Electricity",
+          heating_cop: 1,
+          dhw_cop: 1,
+          ashrae_standard: "90.1-2016",
+        },
+      ],
+    },
+    {
+      id: 2,
+      is_displayed: true,
+      is_base_case: false,
+      starting_template: "elec_ashp",
+      case_name: "Air Source HP Heating",
+      state: "NY",
+      climate_zone: "4A",
+      projection_case: "MidCase",
+      design_areas: [
+        {
+          type: "HighriseApartment",
+          area: 200000,
+          heating_fuel: "Electricity",
+          dhw_fuel: "Electricity",
+          heating_cop: 2.5,
+          dhw_cop: 2.5,
+          ashrae_standard: "90.1-2016",
         },
       ],
     },
@@ -126,6 +129,18 @@ export default function buildingReducer(state = initialState, action) {
       let new_state = produce(state, (draft) => {
         let selection = draft.case_inputs.find((d) => d.id === idx);
         selection.case_name = case_name;
+      });
+      return {
+        ...new_state,
+      };
+    }
+
+    case "SET_BASE_CASE": {
+      let { idx } = action.payload;
+      let new_state = produce(state, (draft) => {
+        draft.case_inputs.forEach((e, i) => {
+          draft.case_inputs[i].is_base_case = e.id === idx ? true : false;
+        });
       });
       return {
         ...new_state,

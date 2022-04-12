@@ -10,6 +10,52 @@ import { conn } from "../../store/connect";
 import { getIdealSpacing } from "./spacing";
 import { makeStyles } from "@material-ui/styles";
 
+// todo: this should probably be in apicalls.
+const createBaseComparison = (case_results) => {
+  let base_case = case_results.find((d) => d.is_base_case === true);
+  let alternates = case_results.filter((d) => d.is_base_case === false);
+
+  let base_case_2022_val = base_case.case_results.emissions_projection.find(
+    (d) => d.year == 2022
+  ).kg_co2_per_sf;
+  let base_case_2050_val = base_case.case_results.emissions_projection.find(
+    (d) => d.year == 2050
+  ).kg_co2_per_sf;
+
+  let comparison_array = [
+    {
+      name: base_case.case_name,
+      val_2022: base_case_2022_val,
+      val_2050: base_case_2050_val,
+      pct_2022: "-",
+      pct_2050: "-",
+    },
+  ];
+
+  alternates.forEach((alt, i) => {
+    let alt_2022_val = alt.case_results.emissions_projection.find(
+      (d) => d.year == 2022
+    ).kg_co2_per_sf;
+    let alt_2050_val = alt.case_results.emissions_projection.find(
+      (d) => d.year == 2050
+    ).kg_co2_per_sf;
+
+    let pct_2022 = 1 - alt_2022_val / base_case_2022_val;
+    let pct_2050 = 1 - alt_2050_val / base_case_2050_val;
+
+    let comparison = {
+      name: alt.case_name,
+      val_2022: alt_2022_val,
+      val_2050: alt_2050_val,
+      pct_2022: pct_2022,
+      pct_2050: pct_2050,
+    };
+    comparison_array.push(comparison);
+  });
+
+  return comparison_array;
+};
+
 const useStyles = makeStyles({
   container: {
     height: "100%",
@@ -22,6 +68,8 @@ const PlotContainer = (props) => {
   const container = useRef(null);
 
   let { case_results: case_results, plot_config, window_dimensions } = props;
+
+  console.log(case_results);
 
   let case_results_displayed = case_results.filter(
     (f) => f.is_displayed === true
@@ -90,13 +138,30 @@ const PlotContainer = (props) => {
       }
     };
 
+    let getCaseColor = (fuel_type, i) => {
+      // source: https://www.schemecolor.com/red-to-blue-color-scheme.php
+
+      let rScheme = d3.interpolateYlOrRd;
+      let bScheme = d3.interpolatePuBu;
+
+      // let reds = [rScheme(1), rScheme(0.8), rScheme(0.6)];
+      // let blues = [bScheme(0.6), bScheme(1), bScheme(0.8)];
+      let reds = ["#F31D64", "#FE433C", "#A224AD"];
+      let blues = ["#0095EF", "#3C50B1", "#0095EF"];
+
+      if (fuel_type === "Natural Gas") {
+        return reds[i];
+      } else if (fuel_type === "Electricity") {
+        return blues[i];
+      }
+    };
+
     let icon_array = case_results_displayed.map((d, i) => {
       let { case_fuel_type, case_cop } = d;
 
-      let case_icon = getCaseIcon(case_fuel_type, case_cop);
       return {
-        case_color: d3.schemeCategory10[i],
-        case_icon_d: case_icon,
+        case_color: getCaseColor(case_fuel_type, i),
+        case_icon_d: getCaseIcon(case_fuel_type, case_cop),
       };
     });
 
@@ -208,8 +273,6 @@ const PlotContainer = (props) => {
     let xScale = d3.scaleLinear().range([0, chartdims.width]).domain(domain_x);
     let yScale = d3.scaleLinear().range([0, chartdims.height]).domain(domain_y);
 
-    let colorScale = d3.schemeTableau10;
-
     let transition_duration = disable_transitions ? 0 : 500;
 
     let legend_padding_top = 50;
@@ -227,13 +290,15 @@ const PlotContainer = (props) => {
       .selectAll(".ll97-g")
       .data([0])
       .join("g")
-      .attr("class", "ll97-g");
+      .attr("class", "ll97-g")
+      .attr("opacity", 1);
 
     let multiline_berdo_g = plot_g
       .selectAll(".berdo-g")
       .data([0])
       .join("g")
-      .attr("class", "berdo-g");
+      .attr("class", "berdo-g")
+      .attr("opacity", 1);
 
     let xAxis = d3
       .axisBottom()
@@ -369,7 +434,8 @@ const PlotContainer = (props) => {
         return `translate(${chartdims.width + margins.l + 15}, ${
           margins.t + d - 12
         }) scale(1.25 1.25)`;
-      });
+      })
+      .attr("opacity", 1);
 
     let multiline_berdo_annotations = multiline_berdo_g
       .selectAll(".multiline-berdo-annotations")
@@ -417,7 +483,55 @@ const PlotContainer = (props) => {
       .text("Carbon Intensity (kg/sf/yr)")
       .style("font-weight", 600);
 
-    /* -- HOVER EVENTS -- */
+    let c_rect_width = 400;
+    let c_rect_height = 150;
+    let c_rect_pad = 10;
+
+    let comparison_g = annotation_g
+      .selectAll(".comparison-g")
+      .data([0])
+      .join("g")
+      .attr("class", "comparison-g")
+      .attr(
+        "transform",
+        `
+      translate(${margins.l + chartdims.width - c_rect_width - c_rect_pad}, 
+        ${margins.t + c_rect_pad}
+        )`
+      );
+
+    let comparison_g_rect = comparison_g
+      .selectAll(".comparison-g-rect")
+      .data([0])
+      .join("rect")
+      .attr("class", "comparison-g-rect")
+      .attr("width", () => c_rect_width)
+      .attr("height", c_rect_height)
+      .attr("stroke", "black solid 1px")
+      .attr("fill", "gray")
+      .attr("opacity", 0.3);
+
+    // .style("stroke-width", "0.5")
+    // .style("stroke", "black");
+
+    const base_comparison_array = createBaseComparison(case_results_displayed);
+
+    // .attr("x", 5)
+    // .attr("y", (d, i) => i * 20 + 20)
+    // .attr("xml:space", "preserve")
+    // .text((d) => {
+    //   return `
+    //   ${d3.format(".2")(d.val_2022)}     ${d3.format(",.1%")(
+    //     +d.pct_2022 ? +d.pct_2022 : 0
+    //   )}     ${d3.format(".2")(d.val_2050)}     ${d3.format(",.1%")(
+    //     +d.pct_2050
+    //   )}`;
+    // });
+
+    /*
+     * HOVER EVENTS
+     */
+
     // flatten for hover circles
     let emissions_projections_flat = [];
     emissions_projections.forEach((e, ei) => {
@@ -554,16 +668,16 @@ const PlotContainer = (props) => {
     // VIEW TOGGLE
 
     if (thresholdView === "berdo") {
-      multiline_ll97_g.remove();
-      multiline_icon_annotations.remove();
+      multiline_ll97_g.attr("opacity", 0);
+      multiline_icon_annotations.attr("opacity", 0);
     }
     if (thresholdView === "ll97") {
-      multiline_berdo_g.remove();
-      multiline_icon_annotations.remove();
+      multiline_berdo_g.attr("opacity", 0);
+      multiline_icon_annotations.attr("opacity", 0);
     }
     if (thresholdView === "none") {
-      multiline_berdo_g.remove();
-      multiline_ll97_g.remove();
+      multiline_berdo_g.attr("opacity", 0);
+      multiline_ll97_g.attr("opacity", 0);
     }
   };
 

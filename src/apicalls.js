@@ -247,6 +247,7 @@ async function getProjectionFromReferenceBuildings(
       case_name: alt.case_name,
       case_id: alt.id,
       is_displayed: alt.is_displayed,
+      is_base_case: alt.is_base_case,
       case_fuel_type: fuel_type,
       case_cop: case_cop,
       case_results,

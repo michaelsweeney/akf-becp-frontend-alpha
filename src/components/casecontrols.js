@@ -10,6 +10,7 @@ import {
   TableCell,
   TableHead,
   Checkbox,
+  Radio,
 } from "@mui/material";
 
 import { makeStyles } from "@material-ui/styles";
@@ -56,6 +57,12 @@ const templates = [
     tag: "vrf",
     case_name: "VRF",
     heating_fuel: "Electricity",
+    heating_cop: 5.5,
+  },
+  {
+    tag: "gshp",
+    case_name: "GSHP",
+    heating_fuel: "Electricity",
     heating_cop: 3.4,
   },
 ];
@@ -95,7 +102,10 @@ const CaseControls = (props) => {
     props.actions.setCaseName({ idx: idx, case_name: case_name });
     // updateResults();
   };
-
+  const handleChangeBaseCase = (idx) => {
+    props.actions.setBaseCase({ idx: idx });
+    // updateResults();
+  };
   const handleChangeHeatingTemplate = (idx, template) => {
     let template_values = templates.find((d) => d.tag === template);
 
@@ -124,17 +134,24 @@ const CaseControls = (props) => {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell>Base Case</TableCell>
             <TableCell>Display Case</TableCell>
             <TableCell>Case Name</TableCell>
             <TableCell>Template</TableCell>
             <TableCell>Heating Fuel</TableCell>
-            <TableCell>Heating COP</TableCell>
+            <TableCell>Annual Heating COP</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {case_inputs.map((c, i) => {
             return (
               <TableRow key={`tablerow-${i}`}>
+                <TableCell sx={{ textAlign: "center" }}>
+                  <Radio
+                    onChange={() => handleChangeBaseCase(i)}
+                    checked={c.is_base_case}
+                  />
+                </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   <FormControl size="small">
                     <Checkbox

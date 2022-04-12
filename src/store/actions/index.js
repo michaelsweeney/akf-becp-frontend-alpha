@@ -48,6 +48,13 @@ export function setCaseIsDisplayed(payload) {
   };
 }
 
+export function setBaseCase(payload) {
+  return {
+    type: "SET_BASE_CASE",
+    payload: payload,
+  };
+}
+
 /* general ui actions */
 export function setWindowDimensions(dims) {
   return {
