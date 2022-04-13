@@ -13,7 +13,7 @@ import CaseControls from "./components/casecontrols";
 import GlobalControls from "./components/globalcontrols";
 import { LoadingSpinner } from "./components/loadingspinner";
 import { LoadingScreenError } from "./components/loadingerrorscreen";
-
+import { Header } from "./components/header";
 const theme = createTheme({
   palette: {
     secondary: {
@@ -34,13 +34,18 @@ const useStyles = makeStyles({
   main: {
     width: "100%",
     height: "100%",
-    // border: "black solid 1px",
     boxSizing: "border-box",
     padding: 10,
   },
-  top: {
+  header: {
     display: "block",
-    height: "calc(100% - 150px)",
+    width: "100%",
+    height: "75px",
+    boxSizing: "border-box",
+  },
+  topMain: {
+    display: "block",
+    height: "calc(100% - 250px - 75px)",
     width: "calc(100%)",
     boxSizing: "border-box",
     padding: 10,
@@ -50,23 +55,20 @@ const useStyles = makeStyles({
     display: "inline-block",
     width: "250px",
     height: "100%",
-    // border: "black solid 1px",
     boxSizing: "border-box",
-    overflowY: "scroll",
     verticalAlign: "top",
   },
   topRight: {
     display: "inline-block",
     width: "calc(100% - 250px)",
     height: "100%",
-    // border: "black solid 1px",
     boxSizing: "border-box",
     verticalAlign: "top",
   },
 
   bottom: {
     padding: 10,
-    height: "150px",
+    height: "250px",
     width: "calc(100%)",
     boxSizing: "border-box",
   },
@@ -112,7 +114,10 @@ const App = (props) => {
       <div className={classes.root}>
         <div className={classes.main}>
           <LoadingSpinner isLoading={isLoading} />
-          <div className={classes.top}>
+          <div className={classes.header}>
+            <Header />
+          </div>
+          <div className={classes.topMain}>
             <div className={classes.topLeft}>
               <h5>Global Controls</h5>
               <GlobalControls />

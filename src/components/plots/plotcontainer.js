@@ -466,13 +466,13 @@ const PlotContainer = (props) => {
       )
       .attr("text-anchor", "middle")
       .text("Carbon Intensity over Time")
-      .style("font-weight", 600);
+      .style("font-weight", 500);
 
     title_g
-      .selectAll(".x-axis-title-g")
+      .selectAll(".y-axis-title-g")
       .data([0])
       .join("text")
-      .attr("class", "x-axis-title-g")
+      .attr("class", "y-axis-title-g")
       .attr(
         "transform",
         `translate(${margins.l / 2},${
@@ -481,7 +481,7 @@ const PlotContainer = (props) => {
       )
       .attr("text-anchor", "middle")
       .text("Carbon Intensity (kg/sf/yr)")
-      .style("font-weight", 600);
+      .style("font-weight", 500);
 
     let c_rect_width = 400;
     let c_rect_height = 150;
