@@ -1,5 +1,8 @@
 const initialState = {
   case_results: [],
+  case_comparison_displayed: [],
+  case_results_displayed: [],
+  icon_array_displayed: [],
   isLoadingError: false,
 };
 
@@ -14,11 +17,12 @@ export default function buildingReducer(state = initialState, action) {
       } else {
         return {
           ...state,
-          case_results: action.payload,
+          ...action.payload,
           isLoadingError: false,
         };
       }
     }
+
     default:
       return state;
   }

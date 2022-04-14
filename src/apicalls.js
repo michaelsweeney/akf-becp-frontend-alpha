@@ -5,7 +5,7 @@ import {
   HeatPumpIconPath,
   ElectricityIconPath,
   GasIconPath,
-} from "./components/plots/svgicons";
+} from "./components/svgicons";
 
 import * as d3 from "d3";
 
@@ -256,14 +256,102 @@ async function getProjectionFromReferenceBuildings(
     });
   }
 
-  projection_results.map((d) => {
-    let payment_sum = 0;
-    d["berdo_results"]["acp_payments"].map((e) => {
-      payment_sum += e["val"];
+  const createBaseComparison = (case_results) => {
+    let base_case = case_results.find((d) => d.is_base_case === true);
+    let alternates = case_results.filter((d) => d.is_base_case === false);
+
+    let base_case_2022_val = base_case.case_results.emissions_projection.find(
+      (d) => d.year == 2022
+    ).kg_co2_per_sf;
+    let base_case_2050_val = base_case.case_results.emissions_projection.find(
+      (d) => d.year == 2050
+    ).kg_co2_per_sf;
+
+    let comparison_array = [
+      {
+        name: base_case.case_name,
+        val_2022: base_case_2022_val,
+        val_2050: base_case_2050_val,
+        pct_2022: 0,
+        pct_2050: 0,
+      },
+    ];
+
+    alternates.forEach((alt, i) => {
+      let alt_2022_val = alt.case_results.emissions_projection.find(
+        (d) => d.year == 2022
+      ).kg_co2_per_sf;
+      let alt_2050_val = alt.case_results.emissions_projection.find(
+        (d) => d.year == 2050
+      ).kg_co2_per_sf;
+
+      let pct_2022 = 1 - alt_2022_val / base_case_2022_val;
+      let pct_2050 = 1 - alt_2050_val / base_case_2050_val;
+
+      let comparison = {
+        name: alt.case_name,
+        val_2022: alt_2022_val,
+        val_2050: alt_2050_val,
+        pct_2022: pct_2022,
+        pct_2050: pct_2050,
+      };
+      comparison_array.push(comparison);
     });
+    return comparison_array;
+  };
+
+  const case_results_displayed = projection_results.filter(
+    (f) => f.is_displayed === true
+  );
+  const results_comparison_displayed = createBaseComparison(
+    case_results_displayed
+  );
+  // MOVE TO APICALLS
+  let getCaseIcon = (fuel_type, cop) => {
+    if (fuel_type == "Natural Gas") {
+      return GasIconPath;
+    } else if (fuel_type == "Electricity") {
+      if (cop == 1) {
+        return ElectricityIconPath;
+      } else {
+        return HeatPumpIconPath;
+      }
+    }
+  };
+
+  let getCaseColor = (fuel_type, i) => {
+    // source: https://www.schemecolor.com/red-to-blue-color-scheme.php
+
+    let rScheme = d3.interpolateYlOrRd;
+    let bScheme = d3.interpolatePuBu;
+
+    // let reds = [rScheme(1), rScheme(0.8), rScheme(0.6)];
+    // let blues = [bScheme(0.6), bScheme(1), bScheme(0.8)];
+    let reds = ["#F31D64", "#FE433C", "#A224AD"];
+    let blues = ["#0095EF", "#3C50B1", "#0095EF"];
+
+    if (fuel_type === "Natural Gas") {
+      return reds[i];
+    } else if (fuel_type === "Electricity") {
+      return blues[i];
+    }
+  };
+
+  let icon_array_displayed = case_results_displayed.map((d, i) => {
+    let { case_fuel_type, case_cop } = d;
+
+    return {
+      case_color: getCaseColor(case_fuel_type, i),
+      case_icon_d: getCaseIcon(case_fuel_type, case_cop),
+    };
   });
 
-  resultsCallback(projection_results);
+  resultsCallback({
+    projection_results: projection_results,
+    icon_array_displayed: icon_array_displayed,
+    case_comparison_displayed: results_comparison_displayed,
+    case_results_displayed: case_results_displayed,
+  });
 
   isLoadingCallback(false);
 }

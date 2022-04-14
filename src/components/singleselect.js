@@ -15,6 +15,7 @@ const useStyles = makeStyles({
   root: {},
   selectContainer: {
     margin: 10,
+    marginBottom: 15,
     // padding: 0,
     width: 200,
   },
@@ -33,7 +34,7 @@ const SingleSelect = (props) => {
 
   return (
     <div className={classes.selectContainer}>
-      <FormControl fullWidth>
+      <FormControl size="small" fullWidth>
         <InputLabel id={id}>{label}</InputLabel>
         <Select labelId={id} value={value} label={label} onChange={callback}>
           {optionvalues.map((d, i) => {

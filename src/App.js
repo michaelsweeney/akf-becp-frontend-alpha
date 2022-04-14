@@ -11,9 +11,11 @@ import PlotContainer from "./components/plots/plotcontainer";
 // import PlotControls from "./components/plotcontrols";
 import CaseControls from "./components/casecontrols";
 import GlobalControls from "./components/globalcontrols";
+import ReultsTable from "./components/resultstable";
 import { LoadingSpinner } from "./components/loadingspinner";
 import { LoadingScreenError } from "./components/loadingerrorscreen";
 import { Header } from "./components/header";
+import ResultsTable from "./components/resultstable";
 const theme = createTheme({
   palette: {
     secondary: {
@@ -57,6 +59,7 @@ const useStyles = makeStyles({
     height: "100%",
     boxSizing: "border-box",
     verticalAlign: "top",
+    overflow: "auto",
   },
   topRight: {
     display: "inline-block",
@@ -119,7 +122,7 @@ const App = (props) => {
           </div>
           <div className={classes.topMain}>
             <div className={classes.topLeft}>
-              <h5>Global Controls</h5>
+              <h6>Global Controls</h6>
               <GlobalControls />
               <div>
                 {/* <a
@@ -132,7 +135,14 @@ const App = (props) => {
               </div>
             </div>
             <div className={classes.topRight}>
-              {isLoadingError ? <LoadingScreenError /> : <PlotContainer />}
+              {isLoadingError ? (
+                <LoadingScreenError />
+              ) : (
+                <>
+                  <PlotContainer />
+                  <ResultsTable />
+                </>
+              )}
             </div>
           </div>
           <div className={classes.bottom}>

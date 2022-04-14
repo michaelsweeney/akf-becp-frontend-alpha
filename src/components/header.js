@@ -9,7 +9,7 @@ const useStyles = makeStyles({
   },
   left: {
     display: "inline-block",
-    // width: "100px",
+    width: "100px",
     // backgroundColor: "blue",
     height: "100%",
     verticalAlign: "middle",
@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   },
   middle: {
     display: "inline-block",
-    // width: "calc(100% - 200px)",
+    width: "calc(100% - 200px)",
     // backgroundColor: "yellow",
     height: "100%",
     verticalAlign: "middle",
@@ -25,7 +25,7 @@ const useStyles = makeStyles({
   },
   right: {
     display: "inline-block",
-    // width: "100px",
+    width: "100px",
     // backgroundColor: "purple",
     height: "100%",
     verticalAlign: "middle",
@@ -40,14 +40,15 @@ const useStyles = makeStyles({
   },
   title: {
     display: "inline-block",
-    // verticalAlign: "middle",
-    // height: "100%",
+    verticalAlign: "middle",
+    height: "100%",
     // textAlign: "center",
     fontSize: "24px",
-    marginLeft: 20,
+    marginLeft: 15,
     position: "relative",
-    bottom: 5,
+    top: 20,
     fontWeight: "600",
+    color: "#28375A",
   },
 });
 const Header = (props) => {
@@ -58,11 +59,12 @@ const Header = (props) => {
         <div className={classes.imageContainer}>
           <img alt="" width="100" src="akf-logo.png" />
         </div>
+      </div>
+      <div className={classes.middle}>
         <div className={classes.title}>
-          BUILDING ENERGY CARBON PROJECTION TOOL
+          Building Energy Carbon Projection Tool
         </div>
       </div>
-      <div className={classes.middle}></div>
       <div className={classes.right}></div>
     </div>
   );

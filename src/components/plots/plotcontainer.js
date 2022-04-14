@@ -1,7 +1,11 @@
 import * as d3 from "d3";
 import { color } from "d3";
 
-import { HeatPumpIconPath, ElectricityIconPath, GasIconPath } from "./svgicons";
+import {
+  HeatPumpIconPath,
+  ElectricityIconPath,
+  GasIconPath,
+} from "../svgicons";
 
 import { useRef, useEffect } from "react";
 
@@ -9,52 +13,7 @@ import { conn } from "../../store/connect";
 
 import { getIdealSpacing } from "./spacing";
 import { makeStyles } from "@material-ui/styles";
-
-// todo: this should probably be in apicalls.
-const createBaseComparison = (case_results) => {
-  let base_case = case_results.find((d) => d.is_base_case === true);
-  let alternates = case_results.filter((d) => d.is_base_case === false);
-
-  let base_case_2022_val = base_case.case_results.emissions_projection.find(
-    (d) => d.year == 2022
-  ).kg_co2_per_sf;
-  let base_case_2050_val = base_case.case_results.emissions_projection.find(
-    (d) => d.year == 2050
-  ).kg_co2_per_sf;
-
-  let comparison_array = [
-    {
-      name: base_case.case_name,
-      val_2022: base_case_2022_val,
-      val_2050: base_case_2050_val,
-      pct_2022: "-",
-      pct_2050: "-",
-    },
-  ];
-
-  alternates.forEach((alt, i) => {
-    let alt_2022_val = alt.case_results.emissions_projection.find(
-      (d) => d.year == 2022
-    ).kg_co2_per_sf;
-    let alt_2050_val = alt.case_results.emissions_projection.find(
-      (d) => d.year == 2050
-    ).kg_co2_per_sf;
-
-    let pct_2022 = 1 - alt_2022_val / base_case_2022_val;
-    let pct_2050 = 1 - alt_2050_val / base_case_2050_val;
-
-    let comparison = {
-      name: alt.case_name,
-      val_2022: alt_2022_val,
-      val_2050: alt_2050_val,
-      pct_2022: pct_2022,
-      pct_2050: pct_2050,
-    };
-    comparison_array.push(comparison);
-  });
-
-  return comparison_array;
-};
+import ResultsTable from "../resultstable";
 
 const useStyles = makeStyles({
   container: {
@@ -67,13 +26,14 @@ const PlotContainer = (props) => {
   const classes = useStyles();
   const container = useRef(null);
 
-  let { case_results: case_results, plot_config, window_dimensions } = props;
-
-  console.log(case_results);
-
-  let case_results_displayed = case_results.filter(
-    (f) => f.is_displayed === true
-  );
+  let {
+    case_results,
+    case_comparison_displayed,
+    icon_array_displayed,
+    case_results_displayed,
+    plot_config,
+    window_dimensions,
+  } = props;
 
   useEffect(() => {
     if (case_results_displayed.length > 0) {
@@ -99,7 +59,7 @@ const PlotContainer = (props) => {
       t: 50,
       b: 150,
       r: 200,
-      l: 50,
+      l: 100,
     };
     let containerdims = {
       width: 700,
@@ -126,44 +86,7 @@ const PlotContainer = (props) => {
       (d) => d["ll97_results"]["emissions_thresholds_per_sf"]
     );
 
-    let getCaseIcon = (fuel_type, cop) => {
-      if (fuel_type == "Natural Gas") {
-        return GasIconPath;
-      } else if (fuel_type == "Electricity") {
-        if (cop == 1) {
-          return ElectricityIconPath;
-        } else {
-          return HeatPumpIconPath;
-        }
-      }
-    };
-
-    let getCaseColor = (fuel_type, i) => {
-      // source: https://www.schemecolor.com/red-to-blue-color-scheme.php
-
-      let rScheme = d3.interpolateYlOrRd;
-      let bScheme = d3.interpolatePuBu;
-
-      // let reds = [rScheme(1), rScheme(0.8), rScheme(0.6)];
-      // let blues = [bScheme(0.6), bScheme(1), bScheme(0.8)];
-      let reds = ["#F31D64", "#FE433C", "#A224AD"];
-      let blues = ["#0095EF", "#3C50B1", "#0095EF"];
-
-      if (fuel_type === "Natural Gas") {
-        return reds[i];
-      } else if (fuel_type === "Electricity") {
-        return blues[i];
-      }
-    };
-
-    let icon_array = case_results_displayed.map((d, i) => {
-      let { case_fuel_type, case_cop } = d;
-
-      return {
-        case_color: getCaseColor(case_fuel_type, i),
-        case_icon_d: getCaseIcon(case_fuel_type, case_cop),
-      };
-    });
+    // - end move to apicalls
 
     let y_padding = 1.1;
 
@@ -329,7 +252,7 @@ const PlotContainer = (props) => {
       .duration(transition_duration)
       .attr("d", lineGen)
       .attr("fill", "none")
-      .attr("stroke", (d, i) => icon_array[i].case_color)
+      .attr("stroke", (d, i) => icon_array_displayed[i].case_color)
       .attr("stroke-width", 3);
 
     multiline_berdo_g
@@ -390,7 +313,7 @@ const PlotContainer = (props) => {
 
     let multiline_legend_icons = multiline_legend_g
       .selectAll(".multiline-legend-icon-g")
-      .data(icon_array)
+      .data(icon_array_displayed)
       .join("path")
       .attr("class", "multiline-legend-icon-g")
       .attr(
@@ -426,8 +349,8 @@ const PlotContainer = (props) => {
       .data(spaced_multiline_icon_annotation_positions)
       .join("path")
       .attr("class", "multiline-icon-annotation")
-      .attr("d", (d, i) => icon_array[i].case_icon_d)
-      .attr("fill", (d, i) => icon_array[i].case_color)
+      .attr("d", (d, i) => icon_array_displayed[i].case_icon_d)
+      .attr("fill", (d, i) => icon_array_displayed[i].case_color)
       .transition()
       .duration(transition_duration)
       .attr("transform", (d, i) => {
@@ -483,38 +406,38 @@ const PlotContainer = (props) => {
       .text("Carbon Intensity (kg/sf/yr)")
       .style("font-weight", 500);
 
-    let c_rect_width = 400;
-    let c_rect_height = 150;
-    let c_rect_pad = 10;
+    // let c_rect_width = 400;
+    // let c_rect_height = 150;
+    // let c_rect_pad = 10;
 
-    let comparison_g = annotation_g
-      .selectAll(".comparison-g")
-      .data([0])
-      .join("g")
-      .attr("class", "comparison-g")
-      .attr(
-        "transform",
-        `
-      translate(${margins.l + chartdims.width - c_rect_width - c_rect_pad}, 
-        ${margins.t + c_rect_pad}
-        )`
-      );
+    // let comparison_g = annotation_g
+    //   .selectAll(".comparison-g")
+    //   .data([0])
+    //   .join("g")
+    //   .attr("class", "comparison-g")
+    //   .attr(
+    //     "transform",
+    //     `
+    //   translate(${margins.l + chartdims.width - c_rect_width - c_rect_pad},
+    //     ${margins.t + c_rect_pad}
+    //     )`
+    //   );
 
-    let comparison_g_rect = comparison_g
-      .selectAll(".comparison-g-rect")
-      .data([0])
-      .join("rect")
-      .attr("class", "comparison-g-rect")
-      .attr("width", () => c_rect_width)
-      .attr("height", c_rect_height)
-      .attr("stroke", "black solid 1px")
-      .attr("fill", "gray")
-      .attr("opacity", 0.3);
+    // let comparison_g_rect = comparison_g
+    //   .selectAll(".comparison-g-rect")
+    //   .data([0])
+    //   .join("rect")
+    //   .attr("class", "comparison-g-rect")
+    //   .attr("width", c_rect_width)
+    //   .attr("height", c_rect_height)
+    //   .attr("stroke", "black solid 1px")
+    //   .attr("fill", "gray")
+    //   .attr("opacity", 0.3);
 
     // .style("stroke-width", "0.5")
     // .style("stroke", "black");
 
-    const base_comparison_array = createBaseComparison(case_results_displayed);
+    // const base_comparison_array = createBaseComparison(case_results_displayed);
 
     // .attr("x", 5)
     // .attr("y", (d, i) => i * 20 + 20)
@@ -567,7 +490,7 @@ const PlotContainer = (props) => {
       .attr("r", 4)
       .attr("cx", (d) => xScale(d.year))
       .attr("cy", (d) => yScale(d.kg_co2_per_sf))
-      .attr("fill", (d, i) => icon_array[d.nameidx].case_color)
+      .attr("fill", (d, i) => icon_array_displayed[d.nameidx].case_color)
       .attr("opacity", 0);
 
     let rect_width = 325;
@@ -681,7 +604,7 @@ const PlotContainer = (props) => {
     }
   };
 
-  return <div className={classes.container} ref={container}></div>;
+  return <div className={classes.container} ref={container} />;
 };
 
 // PlotContainer.whyDidYouRender = true;
@@ -689,6 +612,9 @@ const PlotContainer = (props) => {
 const mapStateToProps = (store) => {
   return {
     case_results: store.case_outputs.case_results,
+    case_results_displayed: store.case_outputs.case_results_displayed,
+    icon_array_displayed: store.case_outputs.icon_array_displayed,
+    case_comparison_displayed: store.case_outputs.case_comparison_displayed,
     plot_config: store.plot_config,
     window_dimensions: store.ui.dims,
   };
