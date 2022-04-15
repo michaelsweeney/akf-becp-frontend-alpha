@@ -261,10 +261,10 @@ async function getProjectionFromReferenceBuildings(
     let alternates = case_results.filter((d) => d.is_base_case === false);
 
     let base_case_2022_val = base_case.case_results.emissions_projection.find(
-      (d) => d.year == 2022
+      (d) => d.year === 2022
     ).kg_co2_per_sf;
     let base_case_2050_val = base_case.case_results.emissions_projection.find(
-      (d) => d.year == 2050
+      (d) => d.year === 2050
     ).kg_co2_per_sf;
 
     let comparison_array = [
@@ -297,7 +297,15 @@ async function getProjectionFromReferenceBuildings(
       };
       comparison_array.push(comparison);
     });
-    return comparison_array;
+
+    let reordered_array = [];
+
+    case_results.forEach((d) => {
+      let { case_name } = d;
+      let comparison_case = comparison_array.find((d) => d.name === case_name);
+      reordered_array.push(comparison_case);
+    });
+    return reordered_array;
   };
 
   const case_results_displayed = projection_results.filter(
@@ -306,6 +314,7 @@ async function getProjectionFromReferenceBuildings(
   const results_comparison_displayed = createBaseComparison(
     case_results_displayed
   );
+
   // MOVE TO APICALLS
   let getCaseIcon = (fuel_type, cop) => {
     if (fuel_type == "Natural Gas") {
@@ -341,6 +350,7 @@ async function getProjectionFromReferenceBuildings(
     let { case_fuel_type, case_cop } = d;
 
     return {
+      case_name: d.case_name,
       case_color: getCaseColor(case_fuel_type, i),
       case_icon_d: getCaseIcon(case_fuel_type, case_cop),
     };

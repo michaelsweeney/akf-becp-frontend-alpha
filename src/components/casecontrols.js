@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import * as api from "../apicalls";
 import { SingleSelect } from "./singleselect";
 import { FocusInput } from "./focusinput";
+import { IconSvg } from "./svgicons";
 
 const useStyles = makeStyles({
   root: {},
@@ -71,7 +72,7 @@ const CaseControls = (props) => {
   // console.log("CaseControlsRender", props);
 
   const classes = useStyles();
-  const { case_inputs } = props;
+  const { case_inputs, icon_array_displayed } = props;
 
   const updateResults = () => {
     api.getProjectionFromReferenceBuildings(
@@ -129,6 +130,24 @@ const CaseControls = (props) => {
     // updateResults();
   };
 
+  console.log(icon_array_displayed);
+
+  let icon_array_all = [];
+  case_inputs.forEach((e) => {
+    let icon_obj = icon_array_displayed.find((d) => e.case_name == d.case_name);
+    if (icon_obj) {
+      icon_array_all.push(icon_obj);
+    } else {
+      icon_array_all.push({
+        case_name: e.case_name,
+        case_color: "white",
+        case_icon_d: "",
+      });
+    }
+  });
+
+  console.log(icon_array_all);
+
   return (
     <div>
       <Table className={classes.table}>
@@ -136,6 +155,7 @@ const CaseControls = (props) => {
           <TableRow>
             <TableCell>Base Case</TableCell>
             <TableCell>Display Case</TableCell>
+            <TableCell>Legend Icon</TableCell>
             <TableCell>Case Name</TableCell>
             <TableCell>Template</TableCell>
             <TableCell>Heating Fuel</TableCell>
@@ -162,6 +182,13 @@ const CaseControls = (props) => {
                     />
                   </FormControl>
                 </TableCell>
+                <TableCell sx={{ textAlign: "center" }}>
+                  <IconSvg
+                    d={icon_array_all[i].case_icon_d}
+                    fill={icon_array_all[i].case_color}
+                  />
+                </TableCell>
+
                 <TableCell>
                   <FormControl size="small" fullWidth>
                     <FocusInput
@@ -229,6 +256,7 @@ const CaseControls = (props) => {
 const mapStateToProps = (store) => {
   return {
     case_inputs: store.case_inputs.case_inputs,
+    icon_array_displayed: store.case_outputs.icon_array_displayed,
   };
 };
 

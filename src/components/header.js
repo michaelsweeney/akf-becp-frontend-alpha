@@ -9,7 +9,7 @@ const useStyles = makeStyles({
   },
   left: {
     display: "inline-block",
-    width: "100px",
+    width: "250px",
     // backgroundColor: "blue",
     height: "100%",
     verticalAlign: "middle",
@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   },
   middle: {
     display: "inline-block",
-    width: "calc(100% - 200px)",
+    width: "calc(100% - 350px)",
     // backgroundColor: "yellow",
     height: "100%",
     verticalAlign: "middle",

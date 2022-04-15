@@ -14,7 +14,12 @@ import { conn } from "../../store/connect";
 import { getIdealSpacing } from "./spacing";
 import { makeStyles } from "@material-ui/styles";
 import ResultsTable from "../resultstable";
-
+let plot_margins = {
+  t: 60,
+  b: 25,
+  r: 200,
+  l: 100,
+};
 const useStyles = makeStyles({
   container: {
     height: "100%",
@@ -48,19 +53,13 @@ const PlotContainer = (props) => {
     if (case_results_displayed.length > 0) {
       createChart(plot_config);
     }
-  }, [case_results_displayed]);
+  }, [case_results_displayed, plot_config]);
 
   const createChart = (plot_config) => {
     let { thresholdView, disable_transitions } = plot_config;
     // handle / transform datasets
     let node = container.current;
-
-    let margins = {
-      t: 50,
-      b: 150,
-      r: 200,
-      l: 100,
-    };
+    let margins = plot_margins;
     let containerdims = {
       width: 700,
       height: 500,
@@ -137,15 +136,15 @@ const PlotContainer = (props) => {
       .attr("class", "plot-g")
       .attr("transform", `translate(${margins.l},${margins.t})`);
 
-    let legend_g = svg
-      .selectAll(".legend-g")
-      .data([0])
-      .join("g")
-      .attr("class", "legend-g")
-      .attr(
-        "transform",
-        `translate(${margins.l},${margins.t + chartdims.height})`
-      );
+    // let legend_g = svg
+    //   .selectAll(".legend-g")
+    //   .data([0])
+    //   .join("g")
+    //   .attr("class", "legend-g")
+    //   .attr(
+    //     "transform",
+    //     `translate(${margins.l},${margins.t + chartdims.height})`
+    //   );
 
     let xaxis_g = svg
       .selectAll(".x-axis-g")
@@ -304,33 +303,31 @@ const PlotContainer = (props) => {
       .attr("stroke-width", 2)
       .attr("stroke-dasharray", 4);
 
-    let multiline_legend_g = legend_g
-      .selectAll(".multiline-legend-g")
-      .data([0])
-      .join("g")
-      .attr("class", "multiline-legend-g")
-      .attr("transform", `translate(0, ${legend_padding_top})`);
+    // let multiline_legend_g = legend_g
+    //   .selectAll(".multiline-legend-g")
+    //   .data([0])
+    //   .join("g")
+    //   .attr("class", "multiline-legend-g")
+    //   .attr("transform", `translate(0, ${legend_padding_top})`);
 
-    let multiline_legend_icons = multiline_legend_g
-      .selectAll(".multiline-legend-icon-g")
-      .data(icon_array_displayed)
-      .join("path")
-      .attr("class", "multiline-legend-icon-g")
-      .attr(
-        "transform",
-        (d, i) => `translate(0, ${i * 30 - 15}) scale(1.25 1.25)`
-      )
-      .attr("d", (d) => d.case_icon_d)
-      .attr("fill", (d, i) => d.case_color);
+    // let multiline_legend_icons = multiline_legend_g
+    //   .selectAll(".multiline-legend-icon-g")
+    //   .data(icon_array_displayed)
+    //   .join("path")
+    //   .attr("class", "multiline-legend-icon-g")
+    //   .attr("transform", (d, i) => `translate(0, ${i * 25 - 15}) scale(1 1)`)
+    //   .attr("d", (d) => d.case_icon_d)
+    //   .attr("fill", (d, i) => d.case_color);
 
-    let multiline_legend_case_text = multiline_legend_g
-      .selectAll(".multiline-legend-case-text")
-      .data(case_results_displayed)
-      .join("text")
-      .attr("x", 40)
-      .attr("y", (d, i) => 30 * i + 5)
-      .attr("class", "multiline-legend-case-text")
-      .text((d) => d.case_name);
+    // let multiline_legend_case_text = multiline_legend_g
+    //   .selectAll(".multiline-legend-case-text")
+    //   .data(case_results_displayed)
+    //   .join("text")
+    //   .attr("x", 40)
+    //   .attr("y", (d, i) => 25 * i)
+    //   .attr("class", "multiline-legend-case-text")
+    //   .attr("font-size", 12)
+    //   .text((d) => d.case_name);
 
     let multiline_icon_annotation_values = emissions_projections.map(
       (d) => d.filter((e) => e.year == "2050")[0]["kg_co2_per_sf"]
@@ -389,6 +386,23 @@ const PlotContainer = (props) => {
       )
       .attr("text-anchor", "middle")
       .text("Carbon Intensity over Time")
+      .style("font-weight", 500);
+
+    title_g
+      .selectAll(".chart-title-text-sub")
+      .data([0])
+      .join("text")
+      .attr("class", "chart-title-text-sub")
+      .attr(
+        "transform",
+        `translate(${margins.l + chartdims.width / 2},${margins.t / 2 + 18})`
+      )
+      .attr("text-anchor", "middle")
+      .attr("font-size", 12)
+      .text(
+        "whole-building annual operational carbon with varying heat sources"
+      )
+
       .style("font-weight", 500);
 
     title_g
@@ -480,7 +494,8 @@ const PlotContainer = (props) => {
       .attr("stroke-width", 2)
       .attr("stroke", "black")
       .attr("stroke-dasharray", 2)
-      .attr("opacity", 0);
+      .attr("opacity", 0)
+      .style("z-index", 999);
 
     let hover_circles = hover_g
       .selectAll(".hover-circle")
@@ -512,9 +527,10 @@ const PlotContainer = (props) => {
       .attr("y", 0)
       .attr("height", rect_height)
       .attr("width", rect_width)
-      .attr("fill", "gray")
-      .attr("opacity", 0.9)
-      .attr("rx", 0);
+      .attr("fill", "white")
+      .attr("opacity", 1)
+      .attr("rx", 0)
+      .attr("stroke", "gray");
 
     let hover_info_year_text = hover_info_g
       .selectAll(".hover-info-year-text")
@@ -522,20 +538,31 @@ const PlotContainer = (props) => {
       .join("text")
       .attr("class", "hover-info-year-text")
       .attr("x", 15)
-      .attr("y", 30)
+      .attr("y", 20)
       .html("")
+      .attr("font-size", 12)
       .attr("font-weight", 700)
-      .attr("fill", "white");
+      .attr("fill", "black");
+
+    let hover_info_icons = hover_info_g
+      .selectAll(".hover-info-icons")
+      .data(icon_array_displayed)
+      .join("path")
+      .attr("class", "hover-info-icons")
+      .attr("transform", (d, i) => `translate(${15}, ${i * 30 + 30})`)
+      .attr("d", (d) => d.case_icon_d)
+      .attr("fill", (d) => d.case_color);
 
     let hover_info_text = hover_info_g
       .selectAll(".hover-info-text")
       .data(emissions_projections)
       .join("text")
       .attr("class", "hover-info-text")
-      .attr("x", 15)
-      .attr("y", (d, i) => i * 20 + 60)
+      .attr("x", 45)
+      .attr("y", (d, i) => i * 30 + 50)
       .html("")
-      .attr("fill", "white");
+      .attr("font-size", 12)
+      .attr("fill", "black");
 
     // this needs to be the last item appended
     let hover_rect = hover_g
@@ -548,6 +575,7 @@ const PlotContainer = (props) => {
       .attr("opacity", 0);
 
     hover_rect.on("mousemove", function (e) {
+      props.actions.setIsPlotHover(true);
       let mouse = d3.pointer(e);
       let mouseX = mouse[0];
       let mouseY = mouse[1];
@@ -584,12 +612,14 @@ const PlotContainer = (props) => {
     });
 
     svg.on("mouseleave", function (e) {
+      props.actions.setIsPlotHover(false);
       hover_line.attr("opacity", 0);
       hover_info_g.attr("opacity", 0);
     });
 
     // VIEW TOGGLE
 
+    console.log(thresholdView);
     if (thresholdView === "berdo") {
       multiline_ll97_g.attr("opacity", 0);
       multiline_icon_annotations.attr("opacity", 0);
@@ -604,7 +634,13 @@ const PlotContainer = (props) => {
     }
   };
 
-  return <div className={classes.container} ref={container} />;
+  return (
+    <div
+      id="plot-container-element"
+      className={classes.container}
+      ref={container}
+    />
+  );
 };
 
 // PlotContainer.whyDidYouRender = true;
@@ -620,4 +656,5 @@ const mapStateToProps = (store) => {
   };
 };
 
+export { plot_margins };
 export default conn(mapStateToProps)(PlotContainer);

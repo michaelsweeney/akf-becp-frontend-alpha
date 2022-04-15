@@ -4,6 +4,7 @@ const initialState = {
     width: window.innerWidth,
   },
   isLoading: false,
+  isPlotHover: false,
 };
 
 export default function uiReducer(state = initialState, action) {
@@ -18,8 +19,14 @@ export default function uiReducer(state = initialState, action) {
     case "SET_IS_LOADING": {
       return {
         ...state,
-        isLoading: action.payload
-      }
+        isLoading: action.payload,
+      };
+    }
+    case "SET_IS_PLOT_HOVER": {
+      return {
+        ...state,
+        isPlotHover: action.payload,
+      };
     }
     default:
       return state;

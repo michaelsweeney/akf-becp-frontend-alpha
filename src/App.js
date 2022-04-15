@@ -124,23 +124,14 @@ const App = (props) => {
             <div className={classes.topLeft}>
               <h6>Global Controls</h6>
               <GlobalControls />
-              <div>
-                {/* <a
-                  target="_blank"
-                  rel="noopener"
-                  href="https://akf-becp-pyapi.herokuapp.com/"
-                >
-                  view python api
-                </a> */}
-              </div>
             </div>
             <div className={classes.topRight}>
               {isLoadingError ? (
                 <LoadingScreenError />
               ) : (
                 <>
-                  <PlotContainer />
                   <ResultsTable />
+                  <PlotContainer />
                 </>
               )}
             </div>

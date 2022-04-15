@@ -91,3 +91,10 @@ export function setGlobalCaseParameters(obj) {
     payload: obj,
   };
 }
+
+export function setIsPlotHover(payload) {
+  return {
+    type: "SET_IS_PLOT_HOVER",
+    payload: payload,
+  };
+}
