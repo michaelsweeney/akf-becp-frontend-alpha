@@ -337,7 +337,7 @@ async function getProjectionFromReferenceBuildings(
     // let reds = [rScheme(1), rScheme(0.8), rScheme(0.6)];
     // let blues = [bScheme(0.6), bScheme(1), bScheme(0.8)];
     let reds = ["#F31D64", "#FE433C", "#A224AD"];
-    let blues = ["#0095EF", "#3C50B1", "#0095EF"];
+    let blues = [bScheme(0.9), "#3C50B1", "#0095EF"];
 
     if (fuel_type === "Natural Gas") {
       return reds[i];

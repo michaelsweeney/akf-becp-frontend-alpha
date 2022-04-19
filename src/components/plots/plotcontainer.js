@@ -190,7 +190,8 @@ const PlotContainer = (props) => {
       .data([0])
       .join("g")
       .attr("class", "hover-g")
-      .attr("transform", `translate(${margins.l},${margins.t})`);
+      .attr("transform", `translate(${margins.l},${margins.t})`)
+      .style("z-index", 999);
 
     let xScale = d3.scaleLinear().range([0, chartdims.width]).domain(domain_x);
     let yScale = d3.scaleLinear().range([0, chartdims.height]).domain(domain_y);
@@ -494,8 +495,7 @@ const PlotContainer = (props) => {
       .attr("stroke-width", 2)
       .attr("stroke", "black")
       .attr("stroke-dasharray", 2)
-      .attr("opacity", 0)
-      .style("z-index", 999);
+      .attr("opacity", 0);
 
     let hover_circles = hover_g
       .selectAll(".hover-circle")
@@ -516,7 +516,8 @@ const PlotContainer = (props) => {
       .data([0])
       .join("g")
       .attr("class", "hover-info-g")
-      .attr("opacity", 0);
+      .attr("opacity", 0)
+      .attr("transition", "opacity 500ms");
 
     let hover_info_rect = hover_info_g
       .selectAll(".hover-info-rect")
@@ -619,7 +620,6 @@ const PlotContainer = (props) => {
 
     // VIEW TOGGLE
 
-    console.log(thresholdView);
     if (thresholdView === "berdo") {
       multiline_ll97_g.attr("opacity", 0);
       multiline_icon_annotations.attr("opacity", 0);

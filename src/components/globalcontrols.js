@@ -44,6 +44,19 @@ const GlobalControls = (props) => {
 
   const classes = useStyles();
 
+  // handle fake ashrae standard
+  let fake_ashrae_standard = "";
+  let fake_building_type = case_inputs[0].design_areas[0].type;
+  let fake_building_standard = case_inputs[0].design_areas[0].ashrae_standard;
+
+  if (fake_building_type == "Hospital") {
+    fake_ashrae_standard = "90.1-2016";
+  } else {
+    fake_ashrae_standard = fake_building_standard;
+  }
+  // end fake ashrae standard
+
+  console.log(fake_ashrae_standard);
   const updateResults = () => {
     api.getProjectionFromReferenceBuildings(
       case_inputs,
@@ -62,21 +75,33 @@ const GlobalControls = (props) => {
   };
 
   const handleBuildingTypeCallback = (e) => {
-    props.actions.setGlobalCaseParameters(["building_type", e.target.value]);
-    // updateResults();
+    // fake hospital standard
+    if (e.target.value === "Hospital") {
+      props.actions.setGlobalCaseParameters([
+        "ashrae_standard",
+        "DOE_Ref_Pre-1980",
+      ]);
+      props.actions.setGlobalCaseParameters(["building_type", e.target.value]);
+    } else {
+      props.actions.setGlobalCaseParameters(["building_type", e.target.value]);
+    }
+
+    // end fake hospital standard
+    // props.actions.setGlobalCaseParameters(["building_type", e.target.value]);
   };
 
   const handleClimateZoneCallback = (e) => {
     props.actions.setGlobalCaseParameters(["climate_zone", e.target.value]);
-    // updateResults();
   };
 
   const handleCambiumCaseCallback = (e) => {
     props.actions.setGlobalCaseParameters(["projection_case", e.target.value]);
-    // updateResults();
   };
 
   const handleASHRAEStandardCallback = (e) => {
+    // fake hospital here.
+    // console.log(e.target.value);
+    // console.log(case_inputs);
     props.actions.setGlobalCaseParameters(["ashrae_standard", e.target.value]);
     // updateResults();
   };
@@ -110,7 +135,7 @@ const GlobalControls = (props) => {
       <SingleSelect
         optionvalues={ashrae_standards}
         id="ashrae-standard-case-selector"
-        value={ashrae_standard}
+        value={fake_ashrae_standard}
         label="ASHRAE Standards"
         callback={handleASHRAEStandardCallback}
       />

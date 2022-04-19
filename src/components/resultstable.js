@@ -32,7 +32,7 @@ const useStyles = makeStyles({
     position: "absolute",
     // backgroundColor: "rgb(220,220,220)",
     backgroundColor: "white",
-    // zIndex: "500",
+    zIndex: "5",
     // left: 0,
     border: "gray solid 1px",
   },
@@ -104,7 +104,8 @@ const ResultsTable = (props) => {
       style={{
         top: position.top,
         left: position.left,
-        visibility: is_plot_hover ? "hidden" : "visible",
+        opacity: is_plot_hover ? 0 : 1,
+        transition: "opacity 250ms",
       }}
       className={classes.root}
     >

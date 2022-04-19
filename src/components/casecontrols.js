@@ -40,7 +40,7 @@ const templates = [
     tag: "elec_ashp",
     case_name: "Air Source HP",
     heating_fuel: "Electricity",
-    heating_cop: 2.5,
+    heating_cop: 3.2,
   },
   {
     tag: "elec_resistance",
@@ -58,19 +58,17 @@ const templates = [
     tag: "vrf",
     case_name: "VRF",
     heating_fuel: "Electricity",
-    heating_cop: 5.5,
+    heating_cop: 4.45,
   },
   {
     tag: "gshp",
     case_name: "GSHP",
     heating_fuel: "Electricity",
-    heating_cop: 3.4,
+    heating_cop: 4.95,
   },
 ];
 
 const CaseControls = (props) => {
-  // console.log("CaseControlsRender", props);
-
   const classes = useStyles();
   const { case_inputs, icon_array_displayed } = props;
 
@@ -130,8 +128,6 @@ const CaseControls = (props) => {
     // updateResults();
   };
 
-  console.log(icon_array_displayed);
-
   let icon_array_all = [];
   case_inputs.forEach((e) => {
     let icon_obj = icon_array_displayed.find((d) => e.case_name == d.case_name);
@@ -146,16 +142,14 @@ const CaseControls = (props) => {
     }
   });
 
-  console.log(icon_array_all);
-
   return (
     <div>
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell>Legend Icon</TableCell>
             <TableCell>Base Case</TableCell>
             <TableCell>Display Case</TableCell>
-            <TableCell>Legend Icon</TableCell>
             <TableCell>Case Name</TableCell>
             <TableCell>Template</TableCell>
             <TableCell>Heating Fuel</TableCell>
@@ -166,6 +160,12 @@ const CaseControls = (props) => {
           {case_inputs.map((c, i) => {
             return (
               <TableRow key={`tablerow-${i}`}>
+                <TableCell sx={{ textAlign: "center" }}>
+                  <IconSvg
+                    d={icon_array_all[i].case_icon_d}
+                    fill={icon_array_all[i].case_color}
+                  />
+                </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   <Radio
                     onChange={() => handleChangeBaseCase(i)}
@@ -181,12 +181,6 @@ const CaseControls = (props) => {
                       checked={c.is_displayed}
                     />
                   </FormControl>
-                </TableCell>
-                <TableCell sx={{ textAlign: "center" }}>
-                  <IconSvg
-                    d={icon_array_all[i].case_icon_d}
-                    fill={icon_array_all[i].case_color}
-                  />
                 </TableCell>
 
                 <TableCell>
