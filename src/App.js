@@ -73,7 +73,7 @@ const useStyles = makeStyles({
     padding: 10,
     height: "250px",
     width: "calc(100%)",
-    boxSizing: "border-bo",
+    boxSizing: "border-box",
   },
   bottomMain: {
     display: "inline-block",
